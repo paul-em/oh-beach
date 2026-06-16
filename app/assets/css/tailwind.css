@@ -1,0 +1,168 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Design-System „Sunny Beach" – Single Source of Truth.
+  Marken-Tokens stehen hier roh als CSS-Variablen; die semantischen
+  shadcn-vue-Tokens (--background, --primary, ...) mappen darauf.
+  Die maschinenlesbare Spiegelung liegt in /design/tokens.json.
+*/
+:root {
+  /* --- Marken-Rohfarben --- */
+  --brand-sand: #f4e4c1;
+  --brand-sand-soft: #faf1dc;
+  --brand-coral: #ff6b5c;
+  --brand-coral-dark: #e8503f;
+  --brand-turquoise: #2ec4b6;
+  --brand-turquoise-dark: #1fa89b;
+  --brand-sun: #ffd23f;
+  --brand-ocean: #14506b;
+  --brand-ink: #2a2a2a;
+
+  /* --- Radius / Form (rund & freundlich, passt zum Faultier) --- */
+  --radius: 0.75rem;
+
+  /* --- Semantische Tokens (light) --- */
+  --background: #fffbf2;
+  --foreground: #2a2a2a;
+  --card: #ffffff;
+  --card-foreground: #2a2a2a;
+  --popover: #ffffff;
+  --popover-foreground: #2a2a2a;
+  --primary: #ff6b5c;
+  --primary-foreground: #ffffff;
+  --secondary: #2ec4b6;
+  --secondary-foreground: #ffffff;
+  --muted: #f3ecdd;
+  --muted-foreground: #7a6f5d;
+  --accent: #ffd23f;
+  --accent-foreground: #2a2a2a;
+  --destructive: #e5484d;
+  --destructive-foreground: #ffffff;
+  --border: #e7dcc4;
+  --input: #e7dcc4;
+  --ring: #ff6b5c;
+}
+
+.dark {
+  --background: #14242a;
+  --foreground: #f4e4c1;
+  --card: #1c3138;
+  --card-foreground: #f4e4c1;
+  --popover: #1c3138;
+  --popover-foreground: #f4e4c1;
+  --primary: #ff6b5c;
+  --primary-foreground: #ffffff;
+  --secondary: #2ec4b6;
+  --secondary-foreground: #0c1a1f;
+  --muted: #21383f;
+  --muted-foreground: #b8c4be;
+  --accent: #ffd23f;
+  --accent-foreground: #14242a;
+  --destructive: #ff5a5f;
+  --destructive-foreground: #ffffff;
+  --border: #2c4751;
+  --input: #2c4751;
+  --ring: #ff6b5c;
+}
+
+@theme inline {
+  /* shadcn-vue semantische Farben */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Marken-Farben als Utilities: bg-brand-coral, text-brand-ocean, ... */
+  --color-brand-sand: var(--brand-sand);
+  --color-brand-sand-soft: var(--brand-sand-soft);
+  --color-brand-coral: var(--brand-coral);
+  --color-brand-coral-dark: var(--brand-coral-dark);
+  --color-brand-turquoise: var(--brand-turquoise);
+  --color-brand-turquoise-dark: var(--brand-turquoise-dark);
+  --color-brand-sun: var(--brand-sun);
+  --color-brand-ocean: var(--brand-ocean);
+  --color-brand-ink: var(--brand-ink);
+
+  /* Radius-Skala */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+
+  /* Schriften – @nuxt/fonts lädt diese automatisch von Google Fonts */
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fredoka", "Nunito", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Fließtext-Styling für Rechtsseiten (Statuten/Impressum/Datenschutz) */
+.prose-legal {
+  color: var(--foreground);
+  line-height: 1.7;
+}
+.prose-legal h2 {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+.prose-legal h3 {
+  font-size: 1.15rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+.prose-legal p,
+.prose-legal ul,
+.prose-legal ol {
+  margin-bottom: 1rem;
+}
+.prose-legal ul,
+.prose-legal ol {
+  padding-left: 1.25rem;
+}
+.prose-legal ul { list-style: disc; }
+.prose-legal ol { list-style: decimal; }
+.prose-legal li { margin-bottom: 0.25rem; }
+.prose-legal a {
+  color: var(--brand-turquoise-dark);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-legal strong { font-weight: 700; }
+/* Komponenten (z. B. Alert) innerhalb von Prose von den Textabständen ausnehmen */
+.prose-legal .not-prose,
+.prose-legal .not-prose * { margin: 0; }
+

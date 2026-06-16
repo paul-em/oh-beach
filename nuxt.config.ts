@@ -31,6 +31,7 @@ export default defineNuxtConfig({
     googleServiceAccountEmail: '',
     googlePrivateKey: '',
     googleSheetId: '',
+    googleSheetTab: '',
     googleCalendarId: '',
     resendApiKey: '',
     emailFrom: '',

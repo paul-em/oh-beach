@@ -26,24 +26,41 @@ der **Dev-Mock-Modus** (siehe README).
 
 ---
 
-## 2. Mitglieder-Sheet
+## 2. Mitglieder-Sheet (bestehendes Google-Form-Sheet)
 
-1. Ein Google Sheet anlegen, ein Tabellenblatt **`Mitglieder`** benennen.
-2. **Kopfzeile (Zeile 1)** mit diesen Spalten anlegen (Reihenfolge egal, Namen exakt):
+Die App nutzt euer **bestehendes** Sheet mit den Formular-Antworten. Tab-Name standardmäßig
+**`Form responses 1`** (über `NUXT_GOOGLE_SHEET_TAB` anpassbar, falls anders benannt).
 
-   | name | email | passwordHash | paid | active | role |
-   |------|-------|--------------|------|--------|------|
-   | Max Muster | max@example.at | _(leer)_ | ☑ (Checkbox) | ☑ (Checkbox) | member |
+Die App liest diese Spalten automatisch (Namen werden case-insensitiv erkannt):
 
-   - `paid` / `active`: als **Checkbox** formatieren (Einfügen → Checkbox). `TRUE`/`WAHR` zählt als ja.
-   - `passwordHash`: bleibt leer; wird von der App gefüllt, wenn das Mitglied sein Passwort setzt.
-   - `role`: `member` oder `admin`.
-3. Sheet mit der **Service-Account-E-Mail** teilen (Rolle **Bearbeiter**).
-4. Die **Sheet-ID** aus der URL kopieren (`/spreadsheets/d/<ID>/edit`) → `NUXT_GOOGLE_SHEET_ID`.
+| Spalte im Sheet | wird verwendet als |
+|---|---|
+| `Vorname` + `Nachname` | Anzeigename |
+| `Funktion` | Rolle (enthält „Obmann/Vorstand/Kassier/…" → `admin`, sonst `member`) |
+| `Bezahlt <aktuelles Jahr>` (z. B. `Bezahlt 2026`) | **bezahlt** → Buchungs-Freigabe |
+| `Bezahlt <Vorjahr>` | zählt für „Login erlaubt" (aktuelles **oder** Vorjahr bezahlt) |
 
-> Neue Anmeldungen kommen weiterhin über euer bestehendes Google-Formular in dieses
-> Sheet. Der Vorstand hakt `paid` ab und setzt `active`. Erst dann kann das Mitglied
-> über „Passwort setzen" ein Passwort vergeben.
+**Zwei Spalten müsst ihr noch ergänzen:**
+
+1. **`E-Mail`** – Login-Kennung. Pflicht: Ohne E-Mail kann sich ein Mitglied nicht
+   anmelden (Zeilen ohne E-Mail werden ignoriert).
+   - Für bestehende Mitglieder die Adresse eintragen.
+   - Im **Google Formular** „E-Mail-Adressen erfassen" aktivieren, damit neue Anmeldungen
+     automatisch eine E-Mail-Spalte bekommen (`E-Mail-Adresse` wird ebenfalls erkannt).
+2. **`PasswordHash`** – bleibt leer; wird von der App befüllt, sobald das Mitglied sein
+   Passwort setzt.
+
+Danach:
+
+3. Sheet mit der **Service-Account-E-Mail** teilen (Rolle **Bearbeiter** – die App schreibt
+   den Passwort-Hash zurück).
+4. **Sheet-ID** aus der URL kopieren (`/spreadsheets/d/<ID>/edit`) → `NUXT_GOOGLE_SHEET_ID`.
+5. Falls der Tab anders heißt → `NUXT_GOOGLE_SHEET_TAB` setzen.
+
+> Ablauf: Neue Anmeldungen landen weiter über euer Formular im Sheet. Sobald
+> `Bezahlt <Jahr>` abgehakt ist, kann sich das Mitglied über „Passwort setzen" anmelden.
+> Wer (noch) nicht fürs laufende Jahr bezahlt hat, sieht im Login-Bereich einen Hinweis
+> und kann erst nach Zahlungseingang reservieren.
 
 > **Datenschutz:** Das Sheet enthält personenbezogene Daten und Passwort-Hashes –
 > **nicht öffentlich teilen**, nur mit Service-Account und Vorstand.

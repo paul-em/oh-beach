@@ -2,9 +2,13 @@ import { google } from 'googleapis'
 import bcrypt from 'bcryptjs'
 
 /**
- * Mitglieder-Zugriff – Quelle ist das Google Sheet.
+ * Mitglieder-Zugriff – Quelle ist das bestehende Google Sheet (Google-Form-Antworten).
  * Ist keine Google-Config gesetzt (lokale Entwicklung), wird ein In-Memory-
  * Dev-Store mit Testdaten verwendet, damit alle Flows ohne Google testbar sind.
+ *
+ * Erwartetes Sheet (Tab-Name via NUXT_GOOGLE_SHEET_TAB, Standard "Form responses 1"):
+ *   Vorname | Nachname | E-Mail* | PasswordHash* | Funktion | Bezahlt <Jahr> | ...
+ *   (*) Spalten "E-Mail" und "PasswordHash" müssen ergänzt werden.
  */
 
 export interface Member {
@@ -12,17 +16,24 @@ export interface Member {
   name: string
   email: string
   passwordHash: string
-  paid: boolean
-  active: boolean
+  paid: boolean // für das laufende Jahr bezahlt -> Buchungs-Freigabe
+  active: boolean // laufendes oder Vorjahr bezahlt -> Login erlaubt
   role: 'member' | 'admin'
 }
 
-const SHEET_TAB = 'Mitglieder'
-const RANGE = `${SHEET_TAB}!A1:Z2000`
+function getTab(): string {
+  return useRuntimeConfig().googleSheetTab || 'Form responses 1'
+}
 
 function isGoogleConfigured() {
   const c = useRuntimeConfig()
   return Boolean(c.googleServiceAccountEmail && c.googlePrivateKey && c.googleSheetId)
+}
+
+function currentYear(): number {
+  return Number(
+    new Intl.DateTimeFormat('en', { timeZone: 'Europe/Vienna', year: 'numeric' }).format(new Date()),
+  )
 }
 
 function toBool(v: unknown): boolean {
@@ -31,8 +42,9 @@ function toBool(v: unknown): boolean {
   return s === 'true' || s === 'wahr' || s === 'ja' || s === '1' || s === 'x'
 }
 
+const ADMIN_FUNKTIONEN = /obmann|obfrau|vorstand|vorständ|kassier|kassa|schriftführ|präsident|leitung/
+
 function columnLetter(index: number): string {
-  // 0 -> A, 25 -> Z, 26 -> AA
   let n = index
   let s = ''
   do {
@@ -48,7 +60,6 @@ function getSheetsClient() {
   const c = useRuntimeConfig()
   const auth = new google.auth.JWT({
     email: c.googleServiceAccountEmail,
-    // In Env-Variablen sind Zeilenumbrüche oft als \n escaped
     key: c.googlePrivateKey.replace(/\\n/g, '\n'),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   })
@@ -56,25 +67,28 @@ function getSheetsClient() {
 }
 
 interface ColIndex {
-  name: number
+  vorname: number
+  nachname: number
   email: number
   passwordHash: number
-  paid: number
-  active: number
-  role: number
+  paidCur: number
+  paidPrev: number
+  funktion: number
 }
 interface SheetLayout {
   members: Member[]
   colIndex: ColIndex
 }
-const EMPTY_COLS: ColIndex = { name: -1, email: -1, passwordHash: -1, paid: -1, active: -1, role: -1 }
+const EMPTY_COLS: ColIndex = {
+  vorname: -1, nachname: -1, email: -1, passwordHash: -1, paidCur: -1, paidPrev: -1, funktion: -1,
+}
 
 async function readSheet(): Promise<SheetLayout> {
   const c = useRuntimeConfig()
   const sheets = getSheetsClient()
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: c.googleSheetId,
-    range: RANGE,
+    range: `'${getTab()}'!A1:Z2000`,
     valueRenderOption: 'UNFORMATTED_VALUE',
   })
   const rows = (res.data.values || []) as unknown[][]
@@ -89,29 +103,39 @@ async function readSheet(): Promise<SheetLayout> {
     }
     return -1
   }
-  const colIndex = {
-    name: find('name'),
-    email: find('email', 'e-mail'),
-    passwordHash: find('passwordhash', 'password', 'passwort'),
-    paid: find('paid', 'bezahlt'),
-    active: find('active', 'aktiv'),
-    role: find('role', 'rolle'),
+  const y = currentYear()
+  const colIndex: ColIndex = {
+    vorname: find('vorname', 'first name'),
+    nachname: find('nachname', 'last name'),
+    email: find('email', 'e-mail', 'e-mail-adresse', 'email address', 'e-mail adresse'),
+    passwordHash: find('passwordhash', 'password hash', 'password', 'passwort'),
+    paidCur: find(`bezahlt ${y}`, 'bezahlt', 'paid'),
+    paidPrev: find(`bezahlt ${y - 1}`),
+    funktion: find('funktion', 'rolle', 'role'),
   }
+
+  const get = (row: unknown[], idx: number) => (idx >= 0 ? row[idx] : undefined)
 
   const members: Member[] = []
   for (let r = 1; r < rows.length; r++) {
     const row = rows[r]
     if (!row) continue
-    const email = String(row[colIndex.email] ?? '').trim()
-    if (!email) continue
+    const email = String(get(row, colIndex.email) ?? '').trim()
+    if (!email) continue // ohne E-Mail kein Login möglich -> Zeile überspringen
+
+    const name = `${String(get(row, colIndex.vorname) ?? '').trim()} ${String(get(row, colIndex.nachname) ?? '').trim()}`.trim()
+    const paid = toBool(get(row, colIndex.paidCur))
+    const paidPrev = toBool(get(row, colIndex.paidPrev))
+    const funktion = String(get(row, colIndex.funktion) ?? '').toLowerCase()
+
     members.push({
       rowNumber: r + 1,
-      name: String(row[colIndex.name] ?? '').trim(),
+      name: name || email,
       email,
-      passwordHash: String(row[colIndex.passwordHash] ?? '').trim(),
-      paid: toBool(row[colIndex.paid]),
-      active: toBool(row[colIndex.active]),
-      role: String(row[colIndex.role] ?? 'member').trim() === 'admin' ? 'admin' : 'member',
+      passwordHash: String(get(row, colIndex.passwordHash) ?? '').trim(),
+      paid,
+      active: paid || paidPrev,
+      role: ADMIN_FUNKTIONEN.test(funktion) ? 'admin' : 'member',
     })
   }
   return { members, colIndex }
@@ -165,11 +189,14 @@ export async function setMemberPasswordHash(email: string, hash: string): Promis
   }
   const c = useRuntimeConfig()
   const { members, colIndex } = await readSheet()
-  const member = members.find((m) => m.email.toLowerCase() === needle)
-  if (!member || !member.rowNumber || colIndex.passwordHash < 0) {
-    throw createError({ statusCode: 500, statusMessage: 'Mitglied/Spalte nicht gefunden' })
+  if (colIndex.passwordHash < 0) {
+    throw createError({ statusCode: 500, statusMessage: 'Spalte "PasswordHash" fehlt im Sheet.' })
   }
-  const cell = `${SHEET_TAB}!${columnLetter(colIndex.passwordHash)}${member.rowNumber}`
+  const member = members.find((m) => m.email.toLowerCase() === needle)
+  if (!member || !member.rowNumber) {
+    throw createError({ statusCode: 500, statusMessage: 'Mitglied nicht gefunden.' })
+  }
+  const cell = `'${getTab()}'!${columnLetter(colIndex.passwordHash)}${member.rowNumber}`
   const sheets = getSheetsClient()
   await sheets.spreadsheets.values.update({
     spreadsheetId: c.googleSheetId,

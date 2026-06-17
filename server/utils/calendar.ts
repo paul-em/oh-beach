@@ -17,6 +17,17 @@ export interface CourtEvent {
 
 const APP_TAG = 'oh-beach'
 
+/**
+ * Google liefert Event-Zeiten mit Zeitzonen-Offset (z. B. "...+02:00"), unsere
+ * Slots in UTC ("...Z"). Da Belegung/Überschneidungen per String-Vergleich
+ * geprüft werden, normalisieren wir alle Event-Zeiten auf kanonisches UTC-ISO.
+ */
+function normalizeEventISO(dateTime?: string | null, date?: string | null): string {
+  if (dateTime) return new Date(dateTime).toISOString()
+  if (date) return date // ganztägige Termine: YYYY-MM-DD belassen
+  return ''
+}
+
 export function isCalendarConfigured(): boolean {
   const c = useRuntimeConfig()
   return Boolean(c.googleServiceAccountEmail && c.googlePrivateKey && c.googleCalendarId)
@@ -54,8 +65,8 @@ export async function listCourtEvents(timeMin: string, timeMax: string): Promise
   })
   return (res.data.items || []).map((it) => ({
     id: it.id!,
-    startISO: it.start?.dateTime || it.start?.date || '',
-    endISO: it.end?.dateTime || it.end?.date || '',
+    startISO: normalizeEventISO(it.start?.dateTime, it.start?.date),
+    endISO: normalizeEventISO(it.end?.dateTime, it.end?.date),
     summary: it.summary || 'Reserviert',
     memberEmail: it.extendedProperties?.private?.memberEmail,
     courtId: it.extendedProperties?.private?.courtId,
@@ -73,8 +84,8 @@ export async function getCourtEvent(id: string): Promise<CourtEvent | null> {
     const it = res.data
     return {
       id: it.id!,
-      startISO: it.start?.dateTime || '',
-      endISO: it.end?.dateTime || '',
+      startISO: normalizeEventISO(it.start?.dateTime, it.start?.date),
+      endISO: normalizeEventISO(it.end?.dateTime, it.end?.date),
       summary: it.summary || 'Reserviert',
       memberEmail: it.extendedProperties?.private?.memberEmail,
       courtId: it.extendedProperties?.private?.courtId,

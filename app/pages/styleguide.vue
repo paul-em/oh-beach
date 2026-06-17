@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator'
 useHead({ title: 'Styleguide' })
 
 const brandColors = [
+  { name: 'Navy', var: '--brand-navy', hex: '#13283D' },
   { name: 'Sand', var: '--brand-sand', hex: '#F4E4C1' },
   { name: 'Sand soft', var: '--brand-sand-soft', hex: '#FAF1DC' },
   { name: 'Koralle', var: '--brand-coral', hex: '#FF6B5C' },

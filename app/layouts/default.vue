@@ -23,9 +23,8 @@ async function onLogout() {
     <!-- Header -->
     <header class="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
       <div class="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
-        <NuxtLink to="/" class="flex shrink-0 items-center gap-2" aria-label="Zur Startseite">
-          <BrandLogo emblem class="w-10" />
-          <span class="font-display text-lg font-bold tracking-tight text-brand-ocean">O.H.BEACH</span>
+        <NuxtLink to="/" class="shrink-0" aria-label="Zur Startseite">
+          <BrandLogo variant="landscape-small" class="h-8" />
         </NuxtLink>
 
         <nav class="hidden items-center gap-1 md:flex">
@@ -62,26 +61,26 @@ async function onLogout() {
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-border/70 bg-brand-sand-soft">
-      <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 md:flex-row md:items-start md:justify-between">
+    <footer class="bg-brand-navy text-white">
+      <div class="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-12 md:flex-row md:items-start md:justify-between">
         <div class="space-y-4">
-          <BrandLogo class="h-24" />
-          <p class="max-w-sm text-sm text-muted-foreground">
+          <BrandLogo variant="portrait" color="white" class="h-24" />
+          <p class="max-w-sm text-sm text-white/70">
             Der entspannteste Beachvolleyball-Verein. Sand zwischen den Zehen,
             Faultier im Herzen.
           </p>
         </div>
 
         <nav class="grid grid-cols-2 gap-x-10 gap-y-2 text-sm">
-          <NuxtLink to="/kalender" class="text-muted-foreground hover:text-foreground">Platzbelegung</NuxtLink>
-          <NuxtLink to="/statuten" class="text-muted-foreground hover:text-foreground">Statuten</NuxtLink>
-          <NuxtLink to="/impressum" class="text-muted-foreground hover:text-foreground">Impressum</NuxtLink>
-          <NuxtLink to="/datenschutz" class="text-muted-foreground hover:text-foreground">Datenschutz</NuxtLink>
-          <NuxtLink to="/login" class="text-muted-foreground hover:text-foreground">Mitglieder-Login</NuxtLink>
+          <NuxtLink to="/kalender" class="text-white/70 transition-colors hover:text-white">Platzbelegung</NuxtLink>
+          <NuxtLink to="/statuten" class="text-white/70 transition-colors hover:text-white">Statuten</NuxtLink>
+          <NuxtLink to="/impressum" class="text-white/70 transition-colors hover:text-white">Impressum</NuxtLink>
+          <NuxtLink to="/datenschutz" class="text-white/70 transition-colors hover:text-white">Datenschutz</NuxtLink>
+          <NuxtLink to="/login" class="text-white/70 transition-colors hover:text-white">Mitglieder-Login</NuxtLink>
         </nav>
       </div>
-      <div class="border-t border-border/60">
-        <div class="mx-auto w-full max-w-6xl px-4 py-4 text-xs text-muted-foreground">
+      <div class="border-t border-white/15">
+        <div class="mx-auto w-full max-w-6xl px-4 py-4 text-xs text-white/60">
           © {{ year }} O.H.BEACH · Beachvolleyball-Verein
         </div>
       </div>

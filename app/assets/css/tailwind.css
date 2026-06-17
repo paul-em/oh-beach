@@ -11,6 +11,8 @@
 */
 :root {
   /* --- Marken-Rohfarben --- */
+  --brand-navy: #13283d; /* Hauptfarbe (Logo) – tritt stark in Erscheinung */
+  --brand-navy-soft: #1f3b56;
   --brand-sand: #f4e4c1;
   --brand-sand-soft: #faf1dc;
   --brand-coral: #ff6b5c;
@@ -19,26 +21,26 @@
   --brand-turquoise-dark: #1fa89b;
   --brand-sun: #ffd23f;
   --brand-ocean: #14506b;
-  --brand-ink: #2a2a2a;
+  --brand-ink: #13283d;
 
   /* --- Radius / Form (rund & freundlich, passt zum Faultier) --- */
   --radius: 0.75rem;
 
   /* --- Semantische Tokens (light) --- */
   --background: #fffbf2;
-  --foreground: #2a2a2a;
+  --foreground: #13283d;
   --card: #ffffff;
-  --card-foreground: #2a2a2a;
+  --card-foreground: #13283d;
   --popover: #ffffff;
-  --popover-foreground: #2a2a2a;
+  --popover-foreground: #13283d;
   --primary: #ff6b5c;
   --primary-foreground: #ffffff;
-  --secondary: #2ec4b6;
+  --secondary: #13283d;
   --secondary-foreground: #ffffff;
   --muted: #f3ecdd;
-  --muted-foreground: #7a6f5d;
+  --muted-foreground: #6b7280;
   --accent: #ffd23f;
-  --accent-foreground: #2a2a2a;
+  --accent-foreground: #13283d;
   --destructive: #e5484d;
   --destructive-foreground: #ffffff;
   --border: #e7dcc4;
@@ -90,7 +92,9 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* Marken-Farben als Utilities: bg-brand-coral, text-brand-ocean, ... */
+  /* Marken-Farben als Utilities: bg-brand-navy, bg-brand-coral, ... */
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-navy-soft: var(--brand-navy-soft);
   --color-brand-sand: var(--brand-sand);
   --color-brand-sand-soft: var(--brand-sand-soft);
   --color-brand-coral: var(--brand-coral);

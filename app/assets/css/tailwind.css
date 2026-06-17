@@ -26,6 +26,9 @@
   /* --- Radius / Form (rund & freundlich, passt zum Faultier) --- */
   --radius: 0.75rem;
 
+  /* Feine Sand-Körnung (SVG-Noise) – als Hintergrundtextur über warme Flächen */
+  --sand-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)' opacity='0.14'/%3E%3C/svg%3E");
+
   /* --- Semantische Tokens (light) --- */
   --background: #fffbf2;
   --foreground: #13283d;
@@ -131,6 +134,13 @@
     font-weight: 600;
     letter-spacing: -0.01em;
   }
+}
+
+/* Sand-Textur: feine Körnung über die Hintergrundfarbe legen.
+   Wirkt nur auf Elemente mit dieser Klasse (warme Flächen) – nicht auf Karten/Footer. */
+.sand-grain {
+  background-image: var(--sand-noise);
+  background-repeat: repeat;
 }
 
 /* Fließtext-Styling für Rechtsseiten (Statuten/Impressum/Datenschutz) */

@@ -19,7 +19,7 @@ async function onLogout() {
 </script>
 
 <template>
-  <div class="min-h-dvh flex flex-col bg-background text-foreground">
+  <div class="sand-grain min-h-dvh flex flex-col bg-background text-foreground">
     <!-- Header -->
     <header class="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
       <div class="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">

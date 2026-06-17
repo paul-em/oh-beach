@@ -40,7 +40,7 @@ const faqs = [
 <template>
   <div>
     <!-- Hero -->
-    <section class="relative overflow-hidden bg-brand-sand-soft">
+    <section class="sand-grain relative overflow-hidden bg-brand-sand-soft">
       <div class="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 py-20 md:grid-cols-2 md:py-28">
         <div class="space-y-6">
           <span class="inline-flex items-center gap-2 rounded-full bg-brand-sun/30 px-3 py-1 text-sm font-semibold text-brand-ink">

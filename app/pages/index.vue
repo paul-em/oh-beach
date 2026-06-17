@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Sun, Users, Waves, CalendarDays, MapPin, ArrowRight, Clock } from '@lucide/vue'
+import { Sun, Users, CalendarDays, MapPin, ArrowRight, Clock } from '@lucide/vue'
 
 const config = useRuntimeConfig()
 const joinUrl = computed(() => config.public.joinFormUrl || '#mitglied-werden')
@@ -11,12 +11,6 @@ useSeoMeta({
   description:
     'O.H.BEACH – der entspannteste Beachvolleyball-Verein. Spiel, Sand und gute Laune. Werde Mitglied und reserviere deinen Platz online.',
 })
-
-const values = [
-  { icon: Sun, title: 'Entspannt', text: 'Kein Leistungsdruck. Wir spielen für die Freude am Sand – im Tempo eines Faultiers.' },
-  { icon: Users, title: 'Gemeinsam', text: 'Anfänger:innen und Profis teilen sich das Feld. Jede:r ist willkommen, mitzuspielen.' },
-  { icon: Waves, title: 'Draußen', text: 'Frische Luft, Sonne, Sand zwischen den Zehen. Beachvolleyball ist Urlaub für zwischendurch.' },
-]
 
 const trainings = [
   { day: 'Montag', time: '19:00 – 21:00', note: 'Beach Monday - Offenes Training für alle' },
@@ -68,28 +62,14 @@ const faqs = [
       </div>
     </section>
 
-    <!-- Werte -->
-    <SiteSection>
-      <div class="mb-12 max-w-2xl">
-        <h2 class="text-3xl">Warum O.H.BEACH?</h2>
-        <p class="mt-3 text-muted-foreground">
-          Wir sind ein kleiner Verein mit großer Strandliebe. Bei uns zählt der Spaß, nicht die Tabelle.
-        </p>
-      </div>
-      <div class="grid gap-6 md:grid-cols-3">
-        <Card v-for="v in values" :key="v.title" class="border-border/70">
-          <CardHeader>
-            <div class="mb-2 flex size-12 items-center justify-center rounded-xl bg-brand-turquoise/15 text-brand-turquoise-dark">
-              <component :is="v.icon" class="size-6" />
-            </div>
-            <CardTitle>{{ v.title }}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p class="text-muted-foreground">{{ v.text }}</p>
-          </CardContent>
-        </Card>
-      </div>
-    </SiteSection>
+    <!-- Bild -->
+    <section>
+      <img
+        src="/bg.jpg"
+        alt="O.H.BEACH Beachvolleyball-Platz"
+        class="h-75 w-full object-cover md:h-120"
+      />
+    </section>
 
     <!-- Der Platz -->
     <SiteSection alt>
@@ -138,6 +118,37 @@ const faqs = [
             </div>
           </CardContent>
         </Card>
+      </div>
+    </SiteSection>
+
+    <!-- Beachcamp -->
+    <SiteSection alt>
+      <div class="grid items-center gap-10 md:grid-cols-2">
+        <div class="flex justify-center">
+          <video
+            class="w-full max-w-80 rounded-2xl border border-border/60 shadow-lg"
+            controls
+            playsinline
+            preload="none"
+            poster="/beachcamp-26-poster.jpg"
+          >
+            <source src="/beachcamp-26.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div class="space-y-4">
+          <span class="inline-flex items-center gap-2 rounded-full bg-brand-sun/30 px-3 py-1 text-sm font-semibold text-brand-ink">
+            <Sun class="size-4" /> Beachcamp 2026
+          </span>
+          <h2 class="text-3xl">Unser Beachcamp</h2>
+          <p class="text-muted-foreground">
+            Sonne, Sand und gute Laune am Stück: Beim O.H.BEACH-Camp treffen sich
+            Anfänger:innen und alte Hasen zum gemeinsamen Spielen, Üben und Abhängen.
+            Schau rein, wie es bei uns zugeht – und sei nächstes Mal selbst dabei.
+          </p>
+          <Button as-child variant="secondary">
+            <a :href="joinUrl" target="_blank" rel="noopener">Mitglied werden <ArrowRight class="size-4" /></a>
+          </Button>
+        </div>
       </div>
     </SiteSection>
 

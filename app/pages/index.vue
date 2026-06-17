@@ -26,7 +26,7 @@ const steps = [
 const faqs = [
   { q: 'Brauche ich Erfahrung?', a: 'Für den Beach Monday ist es gut wenn du zumindest den Ball beherrschst. Es wird aber in Zukunft noch weitere Angebote geben. Schau einfach mal vorbei!' },
   { q: 'Was kostet die Mitgliedschaft?', a: 'Nur 30€ pro Saison - absolut preiswert für was du bekommst: Zugang zur Beach-Hütte inkl Kühlschrank, Platzbuchung, Gemeinsame Trainingslager, ...' },
-  { q: 'Wie reserviere ich den Platz?', a: 'Als Mitglied loggst du dich ein und buchst freie Zeitslots. Die Belegung ist auch öffentlich einsehbar.' },
+  { q: 'Wie reserviere ich den Platz?', a: 'Als Mitglied loggst du dich ein und buchst freie Zeitslots. Die Belegung ist auch öffentlich einsehbar.', link: { to: '/kalender', label: 'Zur öffentlichen Platzbelegung' } },
 ]
 </script>
 
@@ -52,7 +52,7 @@ const faqs = [
               </NuxtLink>
             </Button>
             <Button as-child size="lg" variant="outline">
-              <NuxtLink to="/kalender">Platz ansehen</NuxtLink>
+              <NuxtLink to="/kalender">Platzverfügbarkeit ansehen</NuxtLink>
             </Button>
           </div>
         </div>
@@ -206,6 +206,13 @@ const faqs = [
         <div v-for="f in faqs" :key="f.q" class="rounded-xl border border-border/60 bg-background p-6">
           <h3 class="text-lg">{{ f.q }}</h3>
           <p class="mt-2 text-muted-foreground">{{ f.a }}</p>
+          <NuxtLink
+            v-if="f.link"
+            :to="f.link.to"
+            class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-turquoise-dark hover:underline"
+          >
+            {{ f.link.label }} <ArrowRight class="size-4" />
+          </NuxtLink>
         </div>
       </div>
     </SiteSection>

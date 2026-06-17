@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Sun, Users, CalendarDays, MapPin, ArrowRight, Clock } from '@lucide/vue'
+import { Sun, Users, CalendarDays, MapPin, ArrowRight, Clock, Trophy } from '@lucide/vue'
 
 const config = useRuntimeConfig()
 const joinUrl = computed(() => config.public.joinFormUrl || '#mitglied-werden')
@@ -32,6 +32,19 @@ const faqs = [
 
 <template>
   <div>
+    <!-- Turnier-Hinweis -->
+    <NuxtLink
+      to="/turnier"
+      class="group block border-b border-brand-turquoise/20 bg-brand-turquoise/10 transition-colors hover:bg-brand-turquoise/15"
+    >
+      <div class="mx-auto flex w-full max-w-6xl items-center justify-center gap-2 px-4 py-2.5 text-center text-sm">
+        <Trophy class="size-4 shrink-0 text-brand-turquoise-dark" />
+        <span class="font-semibold text-brand-ink">SilberHolz Beach Open am 22. August</span>
+        <span class="hidden text-muted-foreground sm:inline">– jetzt Team anmelden</span>
+        <ArrowRight class="size-4 shrink-0 text-brand-turquoise-dark transition-transform group-hover:translate-x-1" />
+      </div>
+    </NuxtLink>
+
     <!-- Hero -->
     <section class="sand-grain relative overflow-hidden bg-brand-sand-soft">
       <div class="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 py-20 md:grid-cols-2 md:py-28">

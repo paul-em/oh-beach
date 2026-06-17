@@ -47,9 +47,9 @@ const faqs = [
           </p>
           <div class="flex flex-wrap gap-3">
             <Button as-child size="lg">
-              <a :href="joinUrl" target="_blank" rel="noopener">
+              <NuxtLink to="#mitglied-werden">
                 Mitglied werden <ArrowRight class="size-4" />
-              </a>
+              </NuxtLink>
             </Button>
             <Button as-child size="lg" variant="outline">
               <NuxtLink to="/kalender">Platz ansehen</NuxtLink>
@@ -146,7 +146,7 @@ const faqs = [
             Schau rein, wie es bei uns zugeht – und sei nächstes Mal selbst dabei.
           </p>
           <Button as-child variant="secondary">
-            <a :href="joinUrl" target="_blank" rel="noopener">Mitglied werden <ArrowRight class="size-4" /></a>
+            <NuxtLink to="#mitglied-werden">Mitglied werden <ArrowRight class="size-4" /></NuxtLink>
           </Button>
         </div>
       </div>

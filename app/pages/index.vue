@@ -216,5 +216,54 @@ const faqs = [
         </div>
       </div>
     </SiteSection>
+
+    <!-- Social Media -->
+    <SiteSection>
+      <div class="mb-10 max-w-2xl">
+        <h2 class="text-3xl">Folg uns</h2>
+        <p class="mt-3 text-muted-foreground">
+          Fotos, Termine und gute Laune vom Beachplatz – bleib auf dem Laufenden.
+        </p>
+      </div>
+      <div class="grid gap-6 sm:grid-cols-2">
+        <a
+          href="https://www.instagram.com/o.h.beach"
+          target="_blank"
+          rel="noopener"
+          class="group flex items-center gap-4 rounded-xl border border-border/60 bg-background p-6 transition-colors hover:border-brand-coral"
+        >
+          <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-tr from-brand-coral via-brand-coral to-brand-sun text-white">
+            <svg viewBox="0 0 24 24" fill="none" class="size-6" aria-hidden="true">
+              <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="currentColor" stroke-width="1.8" />
+              <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8" />
+              <circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" />
+            </svg>
+          </span>
+          <div>
+            <p class="font-display text-lg font-semibold">Instagram</p>
+            <p class="text-sm text-muted-foreground">@o.h.beach</p>
+          </div>
+          <ArrowRight class="ml-auto size-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
+        </a>
+
+        <a
+          href="https://www.facebook.com/share/1BYQ7HS5JH/"
+          target="_blank"
+          rel="noopener"
+          class="group flex items-center gap-4 rounded-xl border border-border/60 bg-background p-6 transition-colors hover:border-brand-turquoise"
+        >
+          <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-navy text-white">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="size-6" aria-hidden="true">
+              <path d="M14.5 8.5h2V5.7c-.35-.05-1.54-.15-2.93-.15-2.9 0-4.88 1.77-4.88 5.02V13H6.2v3.13h2.49V24h3.06v-7.87h2.49l.38-3.13h-2.87v-2.3c0-.9.25-1.5 1.25-1.5z" />
+            </svg>
+          </span>
+          <div>
+            <p class="font-display text-lg font-semibold">Facebook</p>
+            <p class="text-sm text-muted-foreground">O.H.BEACH</p>
+          </div>
+          <ArrowRight class="ml-auto size-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
+        </a>
+      </div>
+    </SiteSection>
   </div>
 </template>

@@ -19,9 +19,7 @@ const values = [
 ]
 
 const trainings = [
-  { day: 'Dienstag', time: '18:00 – 20:00', note: 'Offenes Training für alle' },
-  { day: 'Donnerstag', time: '18:00 – 20:00', note: 'Technik & Spielformen' },
-  { day: 'Samstag', time: '10:00 – 13:00', note: 'Freies Spiel & Turniere' },
+  { day: 'Montag', time: '19:00 – 21:00', note: 'Beach Monday - Offenes Training für alle' },
 ]
 
 const steps = [
@@ -32,7 +30,7 @@ const steps = [
 
 const faqs = [
   { q: 'Brauche ich Erfahrung?', a: 'Nein. Komm einfach zu einem offenen Training vorbei – wir zeigen dir alles.' },
-  { q: 'Was kostet die Mitgliedschaft?', a: 'Den aktuellen Jahresbeitrag findest du im Anmeldeformular. Studierende zahlen ermäßigt.' },
+  { q: 'Was kostet die Mitgliedschaft?', a: 'Nur 30€ pro Saison - absolut preiswert für was du bekommst: Zugang zur Beach-Hütte inkl Kühlschrank, Platzbuchung, Gemeinsame Trainingslager, ...' },
   { q: 'Wie reserviere ich den Platz?', a: 'Als Mitglied loggst du dich ein und buchst freie Zeitslots. Die Belegung ist auch öffentlich einsehbar.' },
 ]
 </script>
@@ -44,14 +42,13 @@ const faqs = [
       <div class="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 py-20 md:grid-cols-2 md:py-28">
         <div class="space-y-6">
           <span class="inline-flex items-center gap-2 rounded-full bg-brand-sun/30 px-3 py-1 text-sm font-semibold text-brand-ink">
-            <Sun class="size-4" /> Beachvolleyball-Verein
+            <Sun class="size-4" /> Volleyball-Verein
           </span>
           <h1 class="text-4xl leading-tight sm:text-5xl lg:text-6xl">
-            Beachvolleyball.<br /><span class="text-brand-coral">Aber ganz entspannt.</span>
+            O.H. Beach<br /><span class="text-brand-coral">Extrem entspannt.</span>
           </h1>
           <p class="max-w-md text-lg text-muted-foreground">
-            Willkommen bei O.H.BEACH. Spiel, Sand und gute Laune – mit einem
-            Faultier als Maskottchen und Platz für alle.
+            Willkommen bei O.H.BEACH. Spiel, Sand und gute Laune - das gibt es bei uns am Beachplatz in Offenhausen - mit bester Flutlichtanlage!
           </p>
           <div class="flex flex-wrap gap-3">
             <Button as-child size="lg">
@@ -124,7 +121,7 @@ const faqs = [
         <Card class="bg-background">
           <CardHeader>
             <CardTitle class="flex items-center gap-2"><CalendarDays class="size-5" /> Trainingszeiten</CardTitle>
-            <CardDescription>Komm vorbei und spiel mit – Schnuppern jederzeit möglich.</CardDescription>
+            <CardDescription>Komm vorbei und spiel mit - Schnuppern jederzeit möglich.</CardDescription>
           </CardHeader>
           <CardContent class="space-y-3">
             <div

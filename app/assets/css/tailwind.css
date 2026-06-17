@@ -119,7 +119,7 @@
 
   /* Schriften – @nuxt/fonts lädt diese automatisch von Google Fonts */
   --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Fredoka", "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Rubik", "Nunito", ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {

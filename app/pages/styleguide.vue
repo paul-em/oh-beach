@@ -76,7 +76,7 @@ const semanticColors = [
       <h2 class="text-2xl">Typografie</h2>
       <Card>
         <CardContent class="space-y-3 pt-6">
-          <p class="font-display text-4xl font-bold">Fredoka · Display</p>
+          <p class="font-display text-4xl font-bold">Rubik · Display</p>
           <h1 class="text-3xl">Überschrift H1</h1>
           <h2 class="text-2xl">Überschrift H2</h2>
           <h3 class="text-xl">Überschrift H3</h3>

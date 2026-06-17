@@ -8,6 +8,7 @@ const nav = [
   { to: '/', label: 'Start' },
   { to: '/kalender', label: 'Platzbelegung' },
   { to: '/statuten', label: 'Statuten' },
+  { to: '/verhaltenskodex', label: 'Verhaltenskodex' },
 ]
 const year = 2026
 
@@ -74,6 +75,7 @@ async function onLogout() {
         <nav class="grid grid-cols-2 gap-x-10 gap-y-2 text-sm">
           <NuxtLink to="/kalender" class="text-white/70 transition-colors hover:text-white">Platzbelegung</NuxtLink>
           <NuxtLink to="/statuten" class="text-white/70 transition-colors hover:text-white">Statuten</NuxtLink>
+          <NuxtLink to="/verhaltenskodex" class="text-white/70 transition-colors hover:text-white">Verhaltenskodex</NuxtLink>
           <NuxtLink to="/impressum" class="text-white/70 transition-colors hover:text-white">Impressum</NuxtLink>
           <NuxtLink to="/datenschutz" class="text-white/70 transition-colors hover:text-white">Datenschutz</NuxtLink>
           <NuxtLink to="/login" class="text-white/70 transition-colors hover:text-white">Mitglieder-Login</NuxtLink>

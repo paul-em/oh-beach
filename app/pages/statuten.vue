@@ -3,7 +3,7 @@ useSeoMeta({ title: 'Statuten', description: 'Statuten des O.H. Beach Volleyball
 </script>
 
 <template>
-  <LegalPage title="Statuten" updated="April 2024">
+  <LegalPage title="Statuten" updated="Februar 2026">
     <h2>§ 1 Name, Sitz und Tätigkeitsbereich</h2>
     <ol>
       <li>Der Verein führt den Namen „O.H. Beach Volleyballverein".</li>

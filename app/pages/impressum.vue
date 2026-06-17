@@ -4,34 +4,37 @@ useSeoMeta({ title: 'Impressum', description: 'Impressum und Offenlegung des Ver
 </script>
 
 <template>
-  <LegalPage title="Impressum" updated="[Datum eintragen]">
+  <LegalPage title="Impressum" updated="Juni 2026">
     <Alert class="not-prose mb-8">
-      <AlertTitle>Platzhalter-Vorlage</AlertTitle>
+      <AlertTitle>Hinweis</AlertTitle>
       <AlertDescription>
-        Bitte mit den echten Vereinsdaten befüllen (Offenlegung gem. § 25 MedienG
-        und § 5 ECG). Im Zweifel rechtlich prüfen lassen.
+        Die ZVR-Zahl wird nach der Eintragung im Vereinsregister ergänzt.
+        Offenlegung gem. § 25 MedienG und § 5 ECG – im Zweifel rechtlich prüfen lassen.
       </AlertDescription>
     </Alert>
 
     <h2>Medieninhaber &amp; Herausgeber</h2>
     <p>
-      [Vereinsname]<br />
-      [Straße Nr.]<br />
-      [PLZ Ort], Österreich
+      O.H. Beach<br />
+      Gartenstraße 1<br />
+      4625 Offenhausen, Österreich
     </p>
 
     <h2>Vereinsdaten</h2>
     <ul>
-      <li><strong>ZVR-Zahl:</strong> [ZVR-Zahl]</li>
-      <li><strong>Vereinssitz:</strong> [Ort]</li>
+      <li><strong>ZVR-Zahl:</strong> wird nach Eintragung ergänzt</li>
+      <li><strong>Vereinssitz:</strong> Offenhausen</li>
+      <li><strong>Vereinsbehörde:</strong> Bezirkshauptmannschaft Wels-Land</li>
       <li><strong>Vereinszweck:</strong> Förderung und Ausübung des Beachvolleyballsports</li>
-      <li><strong>Vertretungsbefugte Organe:</strong> [Obmann/Obfrau, Schriftführer:in, Kassier:in]</li>
+      <li>
+        <strong>Vertretungsbefugte Organe:</strong> Michael Sterrer (Obmann),
+        Paul Emathinger (Obmann-Stellvertreter), Peter Emathinger (Kassier)
+      </li>
     </ul>
 
     <h2>Kontakt</h2>
     <ul>
-      <li><strong>E-Mail:</strong> [kontakt@verein.at]</li>
-      <li><strong>Telefon:</strong> [optional]</li>
+      <li><strong>E-Mail:</strong> info@oh-beach.at</li>
     </ul>
 
     <h2>Haftung für Inhalte</h2>

@@ -4,19 +4,20 @@ useSeoMeta({ title: 'Datenschutzerklärung', description: 'Datenschutzerklärung
 </script>
 
 <template>
-  <LegalPage title="Datenschutzerklärung" updated="[Datum eintragen]">
+  <LegalPage title="Datenschutzerklärung" updated="Juni 2026">
     <Alert class="not-prose mb-8">
-      <AlertTitle>Platzhalter-Vorlage</AlertTitle>
+      <AlertTitle>Hinweis</AlertTitle>
       <AlertDescription>
-        Diese Erklärung bildet die tatsächlich eingesetzten Dienste bereits ab,
-        muss aber mit den Vereinsdaten vervollständigt und rechtlich geprüft werden.
+        Diese Erklärung bildet die tatsächlich eingesetzten Dienste ab und sollte
+        vor Veröffentlichung rechtlich geprüft werden.
       </AlertDescription>
     </Alert>
 
     <h2>1. Verantwortlicher</h2>
     <p>
-      Verantwortlich für die Datenverarbeitung ist [Vereinsname], [Adresse],
-      E-Mail: [kontakt@verein.at]. Bei Fragen zum Datenschutz wende dich an diese Adresse.
+      Verantwortlich für die Datenverarbeitung ist O.H. Beach, Gartenstraße 1,
+      4625 Offenhausen, E-Mail: info@oh-beach.at. Bei Fragen zum Datenschutz
+      wende dich an diese Adresse.
     </p>
 
     <h2>2. Welche Daten wir verarbeiten</h2>
@@ -68,7 +69,7 @@ useSeoMeta({ title: 'Datenschutzerklärung', description: 'Datenschutzerklärung
     <p>
       Mitgliederdaten werden für die Dauer der Mitgliedschaft und darüber hinaus im
       Rahmen gesetzlicher Aufbewahrungspflichten gespeichert. Reservierungsdaten werden
-      nach [Zeitraum] gelöscht bzw. archiviert.
+      spätestens 12 Monate nach dem gebuchten Termin gelöscht bzw. archiviert.
     </p>
 
     <h2>7. Deine Rechte</h2>
@@ -79,6 +80,6 @@ useSeoMeta({ title: 'Datenschutzerklärung', description: 'Datenschutzerklärung
     </p>
 
     <h2>8. Kontakt in Datenschutzfragen</h2>
-    <p>Schreib uns jederzeit an [kontakt@verein.at].</p>
+    <p>Schreib uns jederzeit an info@oh-beach.at.</p>
   </LegalPage>
 </template>

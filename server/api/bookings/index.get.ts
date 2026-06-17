@@ -1,8 +1,13 @@
 /**
  * Öffentliche Belegung eines Tages. Gibt pro Slot frei/belegt/vergangen zurück.
- * Für eingeloggte Mitglieder wird die eigene Buchung markiert (mine + bookingId).
- * Fremde Buchungen werden NICHT mit Namen offengelegt.
+ * Für eingeloggte Mitglieder wird die eigene Buchung markiert (mine + bookingId)
+ * und die Namen der Reservierenden offengelegt (bookedBy). Für Gäste bleibt nur
+ * der Status sichtbar – ohne Namen.
  */
+function bookedByName(summary: string): string {
+  return summary.replace(/^Reserviert\s*[–-]\s*/, '').trim() || 'Reserviert'
+}
+
 export default defineEventHandler(async (event) => {
   const q = getQuery(event)
   const date = typeof q.date === 'string' && isValidDateStr(q.date) ? q.date : todayStr()
@@ -13,6 +18,7 @@ export default defineEventHandler(async (event) => {
 
   const session = await getUserSession(event)
   const userEmail = session?.user?.email?.toLowerCase()
+  const loggedIn = Boolean(userEmail)
 
   const result = slots.map((s) => {
     const overlapping = events.filter((e) => e.startISO < s.endISO && e.endISO > s.startISO)
@@ -22,6 +28,9 @@ export default defineEventHandler(async (event) => {
       : undefined
     const past = !isBookable(s.startISO)
     const status: 'free' | 'busy' | 'past' = booked ? 'busy' : past ? 'past' : 'free'
+    const bookedBy = loggedIn && booked
+      ? overlapping.map((e) => bookedByName(e.summary)).join(', ')
+      : undefined
     return {
       hour: s.hour,
       label: s.label,
@@ -29,6 +38,7 @@ export default defineEventHandler(async (event) => {
       status,
       mine: Boolean(own),
       bookingId: own?.id,
+      bookedBy,
     }
   })
 

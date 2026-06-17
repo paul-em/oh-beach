@@ -10,6 +10,7 @@ export interface BookingSlot {
   status: 'free' | 'busy' | 'past'
   mine: boolean
   bookingId?: string
+  bookedBy?: string
 }
 
 withDefaults(
@@ -73,7 +74,7 @@ const emit = defineEmits<{ book: [number]; cancel: [string] }>()
           class="flex h-20 flex-col items-start justify-between rounded-xl border border-border bg-muted p-3"
         >
           <span class="font-display font-semibold text-muted-foreground">{{ s.label }}</span>
-          <span class="text-sm font-semibold text-muted-foreground">Belegt</span>
+          <span class="w-full truncate text-sm font-semibold text-muted-foreground" :title="s.bookedBy || 'Belegt'">{{ s.bookedBy || 'Belegt' }}</span>
         </div>
 
         <!-- Vergangen -->

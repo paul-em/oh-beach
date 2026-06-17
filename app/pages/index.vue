@@ -24,7 +24,7 @@ const steps = [
 ]
 
 const faqs = [
-  { q: 'Brauche ich Erfahrung?', a: 'Nein. Komm einfach zu einem offenen Training vorbei – wir zeigen dir alles.' },
+  { q: 'Brauche ich Erfahrung?', a: 'Für den Beach Monday ist es gut wenn du zumindest den Ball beherrschst. Es wird aber in Zukunft noch weitere Angebote geben. Schau einfach mal vorbei!' },
   { q: 'Was kostet die Mitgliedschaft?', a: 'Nur 30€ pro Saison - absolut preiswert für was du bekommst: Zugang zur Beach-Hütte inkl Kühlschrank, Platzbuchung, Gemeinsame Trainingslager, ...' },
   { q: 'Wie reserviere ich den Platz?', a: 'Als Mitglied loggst du dich ein und buchst freie Zeitslots. Die Belegung ist auch öffentlich einsehbar.' },
 ]

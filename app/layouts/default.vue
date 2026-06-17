@@ -6,6 +6,7 @@ const { loggedIn, clear } = useUserSession()
 
 const nav = [
   { to: '/', label: 'Start' },
+  { to: '/turnier', label: 'Turnier' },
   { to: '/kalender', label: 'Platzbelegung' },
   { to: '/statuten', label: 'Statuten' },
   { to: '/verhaltenskodex', label: 'Verhaltenskodex' },
@@ -73,6 +74,7 @@ async function onLogout() {
         </div>
 
         <nav class="grid grid-cols-2 gap-x-10 gap-y-2 text-sm">
+          <NuxtLink to="/turnier" class="text-white/70 transition-colors hover:text-white">Turnier</NuxtLink>
           <NuxtLink to="/kalender" class="text-white/70 transition-colors hover:text-white">Platzbelegung</NuxtLink>
           <NuxtLink to="/statuten" class="text-white/70 transition-colors hover:text-white">Statuten</NuxtLink>
           <NuxtLink to="/verhaltenskodex" class="text-white/70 transition-colors hover:text-white">Verhaltenskodex</NuxtLink>

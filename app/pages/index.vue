@@ -23,9 +23,10 @@ const trainings = [
 ]
 
 const steps = [
-  { n: 1, title: 'Formular ausfüllen', text: 'Trag dich über unser Anmeldeformular ein – dauert keine zwei Minuten.' },
-  { n: 2, title: 'Beitrag begleichen', text: 'Wir bestätigen deine Anmeldung, sobald der Mitgliedsbeitrag eingegangen ist.' },
-  { n: 3, title: 'Platz reservieren', text: 'Mit deinem Login reservierst du den Platz online – wann immer du willst.' },
+  { n: 1, title: 'Vorbeikommen & kennenlernen', text: 'Schau am besten zuerst bei einem Trainingstermin vorbei. So lernen wir uns gegenseitig kennen und du bekommst ein Gefühl dafür, ob wir zusammenpassen.' },
+  { n: 2, title: 'Anmeldeformular ausfüllen', text: 'Hat es gepasst? Dann trag dich über unser Anmeldeformular ein – dauert keine zwei Minuten.' },
+  { n: 3, title: 'Nachricht von uns', text: 'Du bekommst eine Nachricht von uns mit den Daten zum Überweisen des Mitgliedsbeitrags – und damit bist du startklar.' },
+  { n: 4, title: 'Dabei sein & mitanpacken', text: 'Nach der Zusage bist du dabei: Platz online reservieren, mitspielen – und beim Vereinsleben mit anpacken.' },
 ]
 
 const faqs = [
@@ -45,7 +46,7 @@ const faqs = [
             <Sun class="size-4" /> Volleyball-Verein
           </span>
           <h1 class="text-4xl leading-tight sm:text-5xl lg:text-6xl">
-            O.H. Beach<br /><span class="text-brand-coral">Extrem entspannt.</span>
+            Teneriffa Vibes<br /><span class="text-brand-coral">mit Hopfen Hypes</span>
           </h1>
           <p class="max-w-md text-lg text-muted-foreground">
             Willkommen bei O.H.BEACH. Spiel, Sand und gute Laune - das gibt es bei uns am Beachplatz in Offenhausen - mit bester Flutlichtanlage!
@@ -144,9 +145,9 @@ const faqs = [
     <SiteSection id="mitglied-werden">
       <div class="mb-12 max-w-2xl">
         <h2 class="text-3xl">Mitglied werden</h2>
-        <p class="mt-3 text-muted-foreground">In drei entspannten Schritten Teil des Vereins.</p>
+        <p class="mt-3 text-muted-foreground">In ein paar entspannten Schritten Teil des Vereins.</p>
       </div>
-      <div class="grid gap-6 md:grid-cols-3">
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <div v-for="s in steps" :key="s.n" class="space-y-3">
           <div class="flex size-11 items-center justify-center rounded-full bg-brand-coral font-display text-lg font-bold text-primary-foreground">
             {{ s.n }}
@@ -155,9 +156,32 @@ const faqs = [
           <p class="text-muted-foreground">{{ s.text }}</p>
         </div>
       </div>
+
+      <!-- Was wir uns wünschen -->
+      <Card class="mt-12 border-brand-turquoise/30 bg-brand-turquoise/5">
+        <CardHeader>
+          <CardTitle class="flex items-center gap-2">
+            <Users class="size-5 text-brand-turquoise-dark" /> Ein faires Miteinander
+          </CardTitle>
+          <CardDescription>Mitglied sein heißt mitmachen – nicht nur einen Platz buchen.</CardDescription>
+        </CardHeader>
+        <CardContent class="space-y-3 text-muted-foreground">
+          <p>
+            Wir bieten dir eine Menge: einen top gepflegten Platz mit Flutlicht, die Beach-Hütte,
+            gemeinsame Trainings, Turniere und Trainingslager – und das alles für einen fairen Beitrag.
+          </p>
+          <p>
+            Im Gegenzug wünschen wir uns, dass du dich als Mitglied aktiv am Vereinsleben beteiligst.
+            Bei uns geht es ums gemeinsame Spielen, Helfen und Dabeisein – nicht nur darum, online einen
+            Platz zu reservieren. So bleibt das Ganze für alle fair: Jede:r gibt ein bisschen, und alle
+            haben mehr davon.
+          </p>
+        </CardContent>
+      </Card>
+
       <div class="mt-10">
         <Button as-child size="lg">
-          <a :href="joinUrl" target="_blank" rel="noopener">Jetzt anmelden <ArrowRight class="size-4" /></a>
+          <a :href="joinUrl" target="_blank" rel="noopener">Zum Anmeldeformular <ArrowRight class="size-4" /></a>
         </Button>
       </div>
     </SiteSection>

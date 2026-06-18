@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Menu, X } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -13,7 +14,16 @@ const nav = [
 ]
 const year = 2026
 
+const menuOpen = ref(false)
+
+// Menü bei Navigation schließen
+const route = useRoute()
+watch(() => route.fullPath, () => {
+  menuOpen.value = false
+})
+
 async function onLogout() {
+  menuOpen.value = false
   await $fetch('/api/auth/logout', { method: 'POST' })
   await clear()
   await navigateTo('/')
@@ -53,8 +63,57 @@ async function onLogout() {
               <NuxtLink to="/login">Login</NuxtLink>
             </Button>
           </template>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            class="md:hidden"
+            :aria-expanded="menuOpen"
+            aria-label="Menü öffnen"
+            @click="menuOpen = !menuOpen"
+          >
+            <X v-if="menuOpen" class="size-5" />
+            <Menu v-else class="size-5" />
+          </Button>
         </div>
       </div>
+
+      <!-- Mobile-Menü -->
+      <Transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="-translate-y-2 opacity-0"
+        enter-to-class="translate-y-0 opacity-100"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="translate-y-0 opacity-100"
+        leave-to-class="-translate-y-2 opacity-0"
+      >
+        <nav
+          v-if="menuOpen"
+          class="border-t border-border/70 md:hidden"
+        >
+          <div class="mx-auto flex w-full max-w-6xl flex-col gap-1 px-4 py-4">
+            <NuxtLink
+              v-for="item in nav"
+              :key="item.to"
+              :to="item.to"
+              class="rounded-md px-3 py-2.5 text-base font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              active-class="bg-muted text-foreground"
+            >
+              {{ item.label }}
+            </NuxtLink>
+
+            <template v-if="loggedIn">
+              <NuxtLink
+                to="/mitglieder"
+                class="rounded-md px-3 py-2.5 text-base font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                active-class="bg-muted text-foreground"
+              >
+                Mein Bereich
+              </NuxtLink>
+            </template>
+          </div>
+        </nav>
+      </Transition>
     </header>
 
     <!-- Seiteninhalt -->

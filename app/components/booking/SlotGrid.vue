@@ -197,7 +197,7 @@ onBeforeUnmount(reset)
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
             <span class="flex w-full items-start justify-between gap-2">
               <span class="slot-legible min-w-0 truncate font-display font-semibold">{{ s.label }}</span>
-              <span v-if="s.weather" class="slot-legible shrink-0 text-xs font-semibold tabular-nums">{{ s.weather.temp }}°</span>
+              <span v-if="s.weather" class="temp-badge slot-legible shrink-0 text-xs font-semibold tabular-nums">{{ s.weather.temp }}°</span>
             </span>
             <span class="slot-legible text-sm font-semibold">{{ selectedSet.has(s.hour) ? 'Ausgewählt' : 'Frei · buchen' }}</span>
           </span>
@@ -215,7 +215,7 @@ onBeforeUnmount(reset)
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
             <span class="flex w-full items-start justify-between gap-2">
               <span class="slot-legible min-w-0 truncate font-display font-semibold">{{ s.label }}</span>
-              <span v-if="s.weather" class="slot-legible shrink-0 text-xs font-semibold tabular-nums">{{ s.weather.temp }}°</span>
+              <span v-if="s.weather" class="temp-badge slot-legible shrink-0 text-xs font-semibold tabular-nums">{{ s.weather.temp }}°</span>
             </span>
             <span class="slot-legible text-sm font-semibold">Frei</span>
           </span>
@@ -245,7 +245,7 @@ onBeforeUnmount(reset)
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
             <span class="flex w-full items-start justify-between gap-2">
               <span class="slot-legible min-w-0 truncate font-display font-semibold">{{ s.label }}</span>
-              <span v-if="s.weather" class="slot-legible shrink-0 text-xs font-semibold tabular-nums">{{ s.weather.temp }}°</span>
+              <span v-if="s.weather" class="temp-badge slot-legible shrink-0 text-xs font-semibold tabular-nums">{{ s.weather.temp }}°</span>
             </span>
             <span class="flex w-full min-w-0 flex-col pr-9">
               <span class="slot-legible truncate text-sm font-semibold text-brand-coral-dark">Deine Buchung</span>
@@ -268,7 +268,7 @@ onBeforeUnmount(reset)
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
             <span class="flex w-full items-start justify-between gap-2">
               <span class="slot-legible min-w-0 truncate font-display font-semibold">{{ s.label }}</span>
-              <span v-if="s.weather" class="slot-legible shrink-0 text-xs font-semibold tabular-nums">{{ s.weather.temp }}°</span>
+              <span v-if="s.weather" class="temp-badge slot-legible shrink-0 text-xs font-semibold tabular-nums">{{ s.weather.temp }}°</span>
             </span>
             <span class="w-full min-w-0">
               <span class="slot-legible block truncate text-sm font-semibold" :title="s.bookedBy || 'Belegt'">{{ s.bookedBy || 'Belegt' }}</span>

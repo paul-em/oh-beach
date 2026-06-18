@@ -1,10 +1,10 @@
 import { SignJWT, jwtVerify } from 'jose'
 
 /**
- * Signierte, kurzlebige Einmal-Tokens für Passwort-Links (stateless, kein DB).
+ * Signierte, kurzlebige Tokens für den Magic-Link-Login (stateless, kein DB).
  */
 
-const PURPOSE = 'set-password'
+const PURPOSE = 'login'
 
 function getSecret(): Uint8Array {
   const c = useRuntimeConfig()
@@ -15,7 +15,7 @@ function getSecret(): Uint8Array {
   return new TextEncoder().encode(secret)
 }
 
-export async function signPasswordToken(email: string): Promise<string> {
+export async function signLoginToken(email: string): Promise<string> {
   return new SignJWT({ email: email.toLowerCase(), purpose: PURPOSE })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
@@ -23,7 +23,7 @@ export async function signPasswordToken(email: string): Promise<string> {
     .sign(getSecret())
 }
 
-export async function verifyPasswordToken(token: string): Promise<{ email: string }> {
+export async function verifyLoginToken(token: string): Promise<{ email: string }> {
   try {
     const { payload } = await jwtVerify(token, getSecret())
     if (payload.purpose !== PURPOSE || typeof payload.email !== 'string') {

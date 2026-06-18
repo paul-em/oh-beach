@@ -11,10 +11,10 @@ export default defineEventHandler(async (event) => {
   const member = await findMemberByEmail(parsed.data.email)
   // Nur an aktive Mitglieder versenden – Existenz wird nicht preisgegeben.
   if (member && member.active) {
-    const token = await signPasswordToken(member.email)
+    const token = await signLoginToken(member.email)
     const base = useRuntimeConfig().public.siteUrl
-    const link = `${base}/passwort/setzen?token=${encodeURIComponent(token)}`
-    await sendPasswordLinkEmail(member.email, link)
+    const link = `${base}/anmelden?token=${encodeURIComponent(token)}`
+    await sendLoginLinkEmail(member.email, link)
   }
 
   return { ok: true }

@@ -3,16 +3,17 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { toast } from 'vue-sonner'
 
 useSeoMeta({ title: 'Login', description: 'Mitglieder-Login von O.H.BEACH.' })
 
 const route = useRoute()
-const { loggedIn, fetch: refreshSession } = useUserSession()
+const { loggedIn } = useUserSession()
 
 const email = ref('')
-const password = ref('')
 const loading = ref(false)
+const sent = ref(false)
 
 // Bereits eingeloggt? Direkt weiter.
 watchEffect(() => {
@@ -27,15 +28,10 @@ function redirectTarget() {
 async function onSubmit() {
   loading.value = true
   try {
-    await $fetch('/api/auth/login', {
-      method: 'POST',
-      body: { email: email.value, password: password.value },
-    })
-    await refreshSession()
-    toast.success('Willkommen zurück!')
-    await navigateTo(redirectTarget())
+    await $fetch('/api/auth/request-link', { method: 'POST', body: { email: email.value } })
+    sent.value = true
   } catch (e: any) {
-    toast.error(e?.data?.statusMessage || e?.statusMessage || 'Login fehlgeschlagen.')
+    toast.error(e?.data?.statusMessage || e?.statusMessage || 'Das hat nicht geklappt.')
   } finally {
     loading.value = false
   }
@@ -48,27 +44,28 @@ async function onSubmit() {
     <Card class="mt-6 w-full">
       <CardHeader>
         <CardTitle>Mitglieder-Login</CardTitle>
-        <CardDescription>Melde dich an, um den Platz zu reservieren.</CardDescription>
+        <CardDescription>
+          Gib deine E-Mail ein – wir schicken dir einen Anmelde-Link. Kein Passwort nötig.
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <form class="space-y-4" @submit.prevent="onSubmit">
+        <Alert v-if="sent">
+          <AlertTitle>Check deine E-Mails</AlertTitle>
+          <AlertDescription>
+            Falls ein aktives Konto mit dieser Adresse existiert, haben wir dir einen
+            Anmelde-Link geschickt. Er ist 30 Minuten gültig.
+          </AlertDescription>
+        </Alert>
+
+        <form v-else class="space-y-4" @submit.prevent="onSubmit">
           <div class="space-y-2">
             <Label for="email">E-Mail</Label>
             <Input id="email" v-model="email" type="email" autocomplete="email" required placeholder="name@verein.at" />
           </div>
-          <div class="space-y-2">
-            <Label for="password">Passwort</Label>
-            <Input id="password" v-model="password" type="password" autocomplete="current-password" required placeholder="••••••••" />
-          </div>
           <Button type="submit" class="w-full" :disabled="loading">
-            {{ loading ? 'Anmelden …' : 'Anmelden' }}
+            {{ loading ? 'Link senden …' : 'Anmelde-Link senden' }}
           </Button>
         </form>
-        <div class="mt-4 text-center text-sm text-muted-foreground">
-          <NuxtLink to="/passwort/vergessen" class="underline underline-offset-4 hover:text-foreground">
-            Passwort vergessen oder erstes Login?
-          </NuxtLink>
-        </div>
       </CardContent>
     </Card>
   </div>

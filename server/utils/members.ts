@@ -1,21 +1,21 @@
 import { google } from 'googleapis'
-import bcrypt from 'bcryptjs'
 
 /**
  * Mitglieder-Zugriff – Quelle ist das bestehende Google Sheet (Google-Form-Antworten).
  * Ist keine Google-Config gesetzt (lokale Entwicklung), wird ein In-Memory-
  * Dev-Store mit Testdaten verwendet, damit alle Flows ohne Google testbar sind.
  *
+ * Login läuft passwortlos über Magic-Links – es genügt die E-Mail-Spalte.
+ *
  * Erwartetes Sheet (Tab-Name via NUXT_GOOGLE_SHEET_TAB, Standard "Form responses 1"):
- *   Vorname | Nachname | E-Mail* | PasswordHash* | Funktion | Bezahlt <Jahr> | ...
- *   (*) Spalten "E-Mail" und "PasswordHash" müssen ergänzt werden.
+ *   Vorname | Nachname | E-Mail* | Funktion | Bezahlt <Jahr> | ...
+ *   (*) Spalte "E-Mail" muss ergänzt werden.
  */
 
 export interface Member {
   rowNumber?: number // 1-basierte Zeile im Sheet (nur im Produktivpfad)
   name: string
   email: string
-  passwordHash: string
   paid: boolean // für das laufende Jahr bezahlt -> Buchungs-Freigabe
   active: boolean // laufendes oder Vorjahr bezahlt -> Login erlaubt
   role: 'member' | 'admin'
@@ -44,16 +44,6 @@ function toBool(v: unknown): boolean {
 
 const ADMIN_FUNKTIONEN = /obmann|obfrau|vorstand|vorständ|kassier|kassa|schriftführ|präsident|leitung/
 
-function columnLetter(index: number): string {
-  let n = index
-  let s = ''
-  do {
-    s = String.fromCharCode(65 + (n % 26)) + s
-    n = Math.floor(n / 26) - 1
-  } while (n >= 0)
-  return s
-}
-
 // ---- Google Sheets Implementierung ---------------------------------------
 
 function getSheetsClient() {
@@ -70,7 +60,6 @@ interface ColIndex {
   vorname: number
   nachname: number
   email: number
-  passwordHash: number
   paidCur: number
   paidPrev: number
   funktion: number
@@ -80,7 +69,7 @@ interface SheetLayout {
   colIndex: ColIndex
 }
 const EMPTY_COLS: ColIndex = {
-  vorname: -1, nachname: -1, email: -1, passwordHash: -1, paidCur: -1, paidPrev: -1, funktion: -1,
+  vorname: -1, nachname: -1, email: -1, paidCur: -1, paidPrev: -1, funktion: -1,
 }
 
 async function readSheet(): Promise<SheetLayout> {
@@ -108,7 +97,6 @@ async function readSheet(): Promise<SheetLayout> {
     vorname: find('vorname', 'first name'),
     nachname: find('nachname', 'last name'),
     email: find('email', 'e-mail', 'e-mail-adresse', 'email address', 'e-mail adresse'),
-    passwordHash: find('passwordhash', 'password hash', 'password', 'passwort'),
     paidCur: find(`bezahlt ${y}`, 'bezahlt', 'paid'),
     paidPrev: find(`bezahlt ${y - 1}`),
     funktion: find('funktion', 'rolle', 'role'),
@@ -132,7 +120,6 @@ async function readSheet(): Promise<SheetLayout> {
       rowNumber: r + 1,
       name: name || email,
       email,
-      passwordHash: String(get(row, colIndex.passwordHash) ?? '').trim(),
       paid,
       active: paid || paidPrev,
       role: ADMIN_FUNKTIONEN.test(funktion) ? 'admin' : 'member',
@@ -150,16 +137,13 @@ function getDevMembers(): Member[] {
       {
         name: 'Test Faultier',
         email: 'test@oh-beach.test',
-        passwordHash: bcrypt.hashSync('beachvolley', 10),
         paid: true,
         active: true,
         role: 'member',
       },
       {
-        // Mitglied ohne Passwort -> zum Testen des "Passwort setzen"-Flows
         name: 'Neue Spielerin',
         email: 'neu@oh-beach.test',
-        passwordHash: '',
         paid: true,
         active: true,
         role: 'member',
@@ -178,32 +162,6 @@ export async function findMemberByEmail(email: string): Promise<Member | null> {
   }
   const { members } = await readSheet()
   return members.find((m) => m.email.toLowerCase() === needle) ?? null
-}
-
-export async function setMemberPasswordHash(email: string, hash: string): Promise<void> {
-  const needle = email.trim().toLowerCase()
-  if (!isGoogleConfigured()) {
-    const m = getDevMembers().find((x) => x.email.toLowerCase() === needle)
-    if (m) m.passwordHash = hash
-    return
-  }
-  const c = useRuntimeConfig()
-  const { members, colIndex } = await readSheet()
-  if (colIndex.passwordHash < 0) {
-    throw createError({ statusCode: 500, statusMessage: 'Spalte "PasswordHash" fehlt im Sheet.' })
-  }
-  const member = members.find((m) => m.email.toLowerCase() === needle)
-  if (!member || !member.rowNumber) {
-    throw createError({ statusCode: 500, statusMessage: 'Mitglied nicht gefunden.' })
-  }
-  const cell = `'${getTab()}'!${columnLetter(colIndex.passwordHash)}${member.rowNumber}`
-  const sheets = getSheetsClient()
-  await sheets.spreadsheets.values.update({
-    spreadsheetId: c.googleSheetId,
-    range: cell,
-    valueInputOption: 'RAW',
-    requestBody: { values: [[hash]] },
-  })
 }
 
 export { isGoogleConfigured }

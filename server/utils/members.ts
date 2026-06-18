@@ -10,6 +10,11 @@ import { google } from 'googleapis'
  * Erwartetes Sheet (Tab-Name via NUXT_GOOGLE_SHEET_TAB, Standard "Form responses 1"):
  *   Vorname | Nachname | E-Mail* | Funktion | Bezahlt <Jahr> | ...
  *   (*) Spalte "E-Mail" muss ergänzt werden.
+ *
+ * Zusätzlich gibt es außerordentliche Mitglieder in einem eigenen Tab
+ * (NUXT_GOOGLE_SHEET_TAB_EXTRA, Standard "Ausserordentliche Mitglieder") mit den
+ * Spalten Vorname | Nachname | E-Mail. Sie dürfen sich einloggen und buchen
+ * (paid + active = true), sind aber nie Admins.
  */
 
 export interface Member {
@@ -23,6 +28,10 @@ export interface Member {
 
 function getTab(): string {
   return useRuntimeConfig().googleSheetTab || 'Form responses 1'
+}
+
+function getExtraTab(): string {
+  return useRuntimeConfig().googleSheetTabExtra || 'Ausserordentliche Mitglieder'
 }
 
 function isGoogleConfigured() {
@@ -128,6 +137,64 @@ async function readSheet(): Promise<SheetLayout> {
   return { members, colIndex }
 }
 
+/**
+ * Außerordentliche Mitglieder aus eigenem Tab (Vorname | Nachname | E-Mail).
+ * Sie sind immer login- und buchungsberechtigt (paid + active = true) und
+ * werden nie als Admin behandelt. Fehlt der Tab, wird er stillschweigend
+ * übersprungen, damit der reguläre Login weiter funktioniert.
+ */
+async function readExtraMembers(): Promise<Member[]> {
+  const c = useRuntimeConfig()
+  const sheets = getSheetsClient()
+  let rows: unknown[][]
+  try {
+    const res = await sheets.spreadsheets.values.get({
+      spreadsheetId: c.googleSheetId,
+      range: `'${getExtraTab()}'!A1:Z2000`,
+      valueRenderOption: 'UNFORMATTED_VALUE',
+    })
+    rows = (res.data.values || []) as unknown[][]
+  } catch {
+    return [] // Tab existiert (noch) nicht -> keine außerordentlichen Mitglieder
+  }
+  const headerRow = rows[0]
+  if (!headerRow) return []
+
+  const header = headerRow.map((h) => String(h ?? '').trim().toLowerCase())
+  const find = (...names: string[]) => {
+    for (const n of names) {
+      const i = header.indexOf(n)
+      if (i !== -1) return i
+    }
+    return -1
+  }
+  const cols = {
+    vorname: find('vorname', 'first name'),
+    nachname: find('nachname', 'last name'),
+    email: find('email', 'e-mail', 'e-mail-adresse', 'email address', 'e-mail adresse'),
+  }
+  const get = (row: unknown[], idx: number) => (idx >= 0 ? row[idx] : undefined)
+
+  const members: Member[] = []
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r]
+    if (!row) continue
+    const email = String(get(row, cols.email) ?? '').trim()
+    if (!email) continue
+
+    const name = `${String(get(row, cols.vorname) ?? '').trim()} ${String(get(row, cols.nachname) ?? '').trim()}`.trim()
+    members.push({
+      rowNumber: r + 1,
+      name: name || email,
+      email,
+      paid: true,
+      active: true,
+      role: 'member',
+    })
+  }
+  return members
+}
+
 // ---- Dev In-Memory Store --------------------------------------------------
 
 let devMembers: Member[] | null = null
@@ -161,7 +228,12 @@ export async function findMemberByEmail(email: string): Promise<Member | null> {
     return getDevMembers().find((m) => m.email.toLowerCase() === needle) ?? null
   }
   const { members } = await readSheet()
-  return members.find((m) => m.email.toLowerCase() === needle) ?? null
+  // Reguläre Mitglieder haben Vorrang (echter Bezahl-/Admin-Status).
+  const regular = members.find((m) => m.email.toLowerCase() === needle)
+  if (regular) return regular
+
+  const extra = await readExtraMembers()
+  return extra.find((m) => m.email.toLowerCase() === needle) ?? null
 }
 
 export { isGoogleConfigured }

@@ -97,7 +97,7 @@ const faqs = [
           <ul class="space-y-3">
             <li class="flex items-center gap-3">
               <MapPin class="size-5 text-brand-coral" />
-              <span>Sandplatz am Vereinsgelände (Adresse im Impressum)</span>
+              <span>Schulstraße 6, 4625 Offenhausen, Oberösterreich</span>
             </li>
             <li class="flex items-center gap-3">
               <Clock class="size-5 text-brand-coral" />

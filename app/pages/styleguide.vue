@@ -14,7 +14,7 @@ const brandColors = [
   { name: 'Sand', var: '--brand-sand', hex: '#F4E4C1' },
   { name: 'Sand soft', var: '--brand-sand-soft', hex: '#FAF1DC' },
   { name: 'Koralle', var: '--brand-coral', hex: '#FF6B5C' },
-  { name: 'Türkis', var: '--brand-turquoise', hex: '#2EC4B6' },
+  { name: 'Türkis', var: '--brand-sky', hex: '#2EC4B6' },
   { name: 'Sonne', var: '--brand-sun', hex: '#FFD23F' },
   { name: 'Ocean', var: '--brand-ocean', hex: '#14506B' },
   { name: 'Ink', var: '--brand-ink', hex: '#2A2A2A' },

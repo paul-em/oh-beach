@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Sun, Users, CalendarDays, MapPin, ArrowRight, Clock, Trophy } from '@lucide/vue'
+import { Users, CalendarDays, MapPin, ArrowRight, Clock, Trophy } from '@lucide/vue'
 
 const config = useRuntimeConfig()
 const joinUrl = computed(() => config.public.joinFormUrl || '#mitglied-werden')
@@ -35,52 +35,58 @@ const faqs = [
     <!-- Turnier-Hinweis -->
     <NuxtLink
       to="/turnier"
-      class="group block border-b border-brand-turquoise/20 bg-brand-turquoise/10 transition-colors hover:bg-brand-turquoise/15"
+      class="group block bg-brand-sky transition-colors hover:bg-brand-sky-dark"
     >
-      <div class="mx-auto flex w-full max-w-6xl items-center justify-center gap-2 px-4 py-2.5 text-center text-sm">
-        <Trophy class="size-4 shrink-0 text-brand-turquoise-dark" />
-        <span class="font-semibold text-brand-ink">SilberHolz Beach Open am 22. August</span>
-        <span class="hidden text-muted-foreground sm:inline">– jetzt Team anmelden</span>
-        <ArrowRight class="size-4 shrink-0 text-brand-turquoise-dark transition-transform group-hover:translate-x-1" />
+      <div class="mx-auto flex w-full max-w-6xl items-center justify-center gap-2 px-4 py-2.5 text-center text-sm text-white">
+        <Trophy class="size-4 shrink-0" />
+        <span class="font-semibold">SilberHolz Beach Open am 22. August</span>
+        <span class="hidden opacity-80 sm:inline">– jetzt Team anmelden</span>
+        <ArrowRight class="size-4 shrink-0 transition-transform group-hover:translate-x-1" />
       </div>
     </NuxtLink>
 
-    <!-- Hero -->
-    <section class="sand-glow relative overflow-hidden bg-brand-sand-soft">
-      <div class="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 py-20 md:grid-cols-2 md:py-28">
-        <div class="space-y-6">
-          <span class="inline-flex items-center gap-2 rounded-full bg-brand-sun/30 px-3 py-1 text-sm font-semibold text-brand-ink">
-            <Sun class="size-4" /> Volleyball-Verein
-          </span>
-          <h1 class="text-4xl leading-tight sm:text-5xl lg:text-6xl">
+    <!-- Hero – vollflächiges Foto mit Sonnen-Glow -->
+    <section class="relative isolate overflow-hidden bg-brand-navy">
+      <img
+        src="/bg.jpg"
+        alt="O.H.BEACH Beachvolleyball-Platz in Offenhausen"
+        class="absolute inset-0 size-full object-cover"
+      />
+      <!-- Scrim: Foto nach unten/links abdunkeln für Textkontrast -->
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-navy via-brand-navy/70 to-brand-navy/25"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-brand-navy/80 to-transparent"></div>
+      <!-- warmer Sonnen-Glow oben rechts -->
+      <div class="absolute inset-0 bg-[radial-gradient(110%_80%_at_85%_-10%,rgba(255,210,63,0.45),transparent_55%)]"></div>
+
+      <div class="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-28 md:pb-24 md:pt-44">
+        <div class="max-w-2xl">
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-brand-sun">
+            Beachvolleyball-Verein · Offenhausen
+          </p>
+          <h1 class="mt-4 text-5xl text-white sm:text-6xl lg:text-7xl">
             Teneriffa Vibes<br /><span class="text-brand-coral">mit Hopfen Hypes</span>
           </h1>
-          <p class="max-w-md text-lg text-muted-foreground">
-            Willkommen bei O.H.BEACH. Spiel, Sand und gute Laune - das gibt es bei uns am Beachplatz in Offenhausen - mit bester Flutlichtanlage!
+          <p class="mt-6 max-w-md text-lg text-white/85">
+            Spiel, Sand und gute Laune am Beachplatz in Offenhausen –
+            mit der besten Flutlichtanlage weit und breit.
           </p>
-          <div class="flex flex-wrap gap-3">
+          <div class="mt-8 flex flex-wrap gap-3">
             <Button as-child size="lg">
               <NuxtLink to="#mitglied-werden">
                 Mitglied werden <ArrowRight class="size-4" />
               </NuxtLink>
             </Button>
-            <Button as-child size="lg" variant="outline">
+            <Button as-child size="lg" variant="outline" class="border-white/40 bg-white/5 text-white hover:bg-white/15 hover:text-white">
               <NuxtLink to="/kalender">Platzverfügbarkeit ansehen</NuxtLink>
             </Button>
           </div>
         </div>
-        <div class="flex justify-center">
-          <BrandFaultierMascot :size="300" />
-        </div>
       </div>
-    </section>
 
-    <!-- Bild -->
-    <section>
-      <img
-        src="/bg.jpg"
-        alt="O.H.BEACH Beachvolleyball-Platz"
-        class="h-75 w-full object-cover md:h-120"
+      <!-- Faultier lugt unten rechts ins Bild -->
+      <BrandFaultierMascot
+        :size="240"
+        class="pointer-events-none absolute -bottom-2 right-4 hidden drop-shadow-2xl lg:block"
       />
     </section>
 
@@ -127,7 +133,7 @@ const faqs = [
                 <p class="font-semibold">{{ t.day }}</p>
                 <p class="text-sm text-muted-foreground">{{ t.note }}</p>
               </div>
-              <span class="font-display font-semibold text-brand-turquoise-dark">{{ t.time }}</span>
+              <span class="font-display font-semibold text-brand-sky-dark">{{ t.time }}</span>
             </div>
           </CardContent>
         </Card>
@@ -135,11 +141,11 @@ const faqs = [
     </SiteSection>
 
     <!-- Beachcamp -->
-    <SiteSection>
+    <SiteSection tone="navy">
       <div class="grid items-center gap-10 md:grid-cols-2">
         <div class="flex justify-center">
           <video
-            class="w-full max-w-80 rounded-2xl border border-border/60 shadow-lg"
+            class="w-full max-w-80 rounded-2xl border border-white/15 shadow-xl"
             controls
             playsinline
             preload="none"
@@ -149,11 +155,11 @@ const faqs = [
           </video>
         </div>
         <div class="space-y-4">
-          <span class="inline-flex items-center gap-2 rounded-full bg-brand-sun/30 px-3 py-1 text-sm font-semibold text-brand-ink">
-            <Sun class="size-4" /> Beachcamp 2026
-          </span>
+          <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brand-sun">
+            Beachcamp 2026
+          </p>
           <h2 class="text-3xl">Unser Beachcamp</h2>
-          <p class="text-muted-foreground">
+          <p class="text-white/80">
             Sonne, Sand und gute Laune am Stück: Beim O.H.BEACH-Camp treffen sich
             Anfänger:innen und alte Hasen zum gemeinsamen Spielen, Üben und Abhängen.
             Schau rein, wie es bei uns zugeht – und sei nächstes Mal selbst dabei.
@@ -182,10 +188,10 @@ const faqs = [
       </div>
 
       <!-- Was wir uns wünschen -->
-      <Card class="mt-12 border-brand-turquoise/30 bg-brand-turquoise/5">
+      <Card class="mt-12 border-brand-sky/30 bg-brand-sky/5">
         <CardHeader>
           <CardTitle class="flex items-center gap-2">
-            <Users class="size-5 text-brand-turquoise-dark" /> Ein faires Miteinander
+            <Users class="size-5 text-brand-sky-dark" /> Ein faires Miteinander
           </CardTitle>
           <CardDescription>Mitglied sein heißt mitmachen – nicht nur einen Platz buchen.</CardDescription>
         </CardHeader>
@@ -222,7 +228,7 @@ const faqs = [
           <NuxtLink
             v-if="f.link"
             :to="f.link.to"
-            class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-turquoise-dark hover:underline"
+            class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-sky-dark hover:underline"
           >
             {{ f.link.label }} <ArrowRight class="size-4" />
           </NuxtLink>
@@ -263,7 +269,7 @@ const faqs = [
           href="https://www.facebook.com/share/1BYQ7HS5JH/"
           target="_blank"
           rel="noopener"
-          class="group flex items-center gap-4 rounded-xl border border-border/60 bg-background p-6 transition-colors hover:border-brand-turquoise"
+          class="group flex items-center gap-4 rounded-xl border border-border/60 bg-background p-6 transition-colors hover:border-brand-sky"
         >
           <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-navy text-white">
             <svg viewBox="0 0 24 24" fill="currentColor" class="size-6" aria-hidden="true">

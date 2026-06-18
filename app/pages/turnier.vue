@@ -121,7 +121,7 @@ const highlights = [
         <Card v-for="h in highlights" :key="h.title" class="bg-background">
           <CardHeader>
             <CardTitle class="flex items-center gap-2">
-              <component :is="h.icon" class="size-5 text-brand-turquoise-dark" /> {{ h.title }}
+              <component :is="h.icon" class="size-5 text-brand-sky-dark" /> {{ h.title }}
             </CardTitle>
           </CardHeader>
           <CardContent class="text-muted-foreground">
@@ -148,10 +148,10 @@ const highlights = [
             nicht alles optimal ausgeht.
           </p>
         </div>
-        <Card class="border-brand-turquoise/30 bg-brand-turquoise/5">
+        <Card class="border-brand-sky/30 bg-brand-sky/5">
           <CardHeader>
             <CardTitle class="flex items-center gap-2">
-              <MapPin class="size-5 text-brand-turquoise-dark" /> Veranstaltungsort
+              <MapPin class="size-5 text-brand-sky-dark" /> Veranstaltungsort
             </CardTitle>
             <CardDescription>Gegenüber vom Freibad Offenhausen</CardDescription>
           </CardHeader>

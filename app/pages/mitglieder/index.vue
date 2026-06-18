@@ -44,7 +44,7 @@ const { user } = useUserSession()
 
       <Card>
         <CardHeader>
-          <div class="mb-2 flex size-12 items-center justify-center rounded-xl bg-brand-turquoise/15 text-brand-turquoise-dark">
+          <div class="mb-2 flex size-12 items-center justify-center rounded-xl bg-brand-sky/15 text-brand-sky-dark">
             <ListChecks class="size-6" />
           </div>
           <CardTitle>Meine Buchungen</CardTitle>

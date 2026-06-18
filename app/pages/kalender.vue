@@ -33,7 +33,7 @@ const { data, pending } = await useFetch('/api/bookings', {
     </Card>
 
     <div class="mt-6 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-      <span class="inline-flex items-center gap-2"><span class="size-3 rounded bg-brand-turquoise/40" /> Frei</span>
+      <span class="inline-flex items-center gap-2"><span class="size-3 rounded bg-brand-sky/40" /> Frei</span>
       <span class="inline-flex items-center gap-2"><span class="size-3 rounded bg-muted-foreground/40" /> Belegt</span>
     </div>
 

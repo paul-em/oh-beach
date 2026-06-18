@@ -32,11 +32,11 @@ const emit = defineEmits<{ book: [number]; cancel: [string] }>()
         <button
           v-if="s.status === 'free' && interactive"
           type="button"
-          class="group flex h-20 flex-col items-start justify-between rounded-xl border-2 border-brand-turquoise/40 bg-brand-turquoise/5 p-3 text-left transition-colors hover:border-brand-turquoise hover:bg-brand-turquoise/10"
+          class="group flex h-20 flex-col items-start justify-between rounded-xl border-2 border-brand-sky/40 bg-brand-sky/5 p-3 text-left transition-colors hover:border-brand-sky hover:bg-brand-sky/10"
           @click="emit('book', s.hour)"
         >
           <span class="font-display font-semibold">{{ s.label }}</span>
-          <span class="text-sm font-semibold text-brand-turquoise-dark">Frei · buchen</span>
+          <span class="text-sm font-semibold text-brand-sky-dark">Frei · buchen</span>
         </button>
 
         <!-- Frei, nur Anzeige -->
@@ -45,7 +45,7 @@ const emit = defineEmits<{ book: [number]; cancel: [string] }>()
           class="flex h-20 flex-col items-start justify-between rounded-xl border border-border bg-card p-3"
         >
           <span class="font-display font-semibold">{{ s.label }}</span>
-          <span class="text-sm font-semibold text-brand-turquoise-dark">Frei</span>
+          <span class="text-sm font-semibold text-brand-sky-dark">Frei</span>
         </div>
 
         <!-- Eigene Buchung -->

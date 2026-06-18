@@ -17,8 +17,8 @@
   --brand-sand-soft: #faf1dc;
   --brand-coral: #ff6b5c;
   --brand-coral-dark: #e8503f;
-  --brand-turquoise: #2ec4b6;
-  --brand-turquoise-dark: #1fa89b;
+  --brand-sky: #2f9fd0;
+  --brand-sky-dark: #1f7fb0;
   --brand-sun: #ffd23f;
   --brand-ocean: #14506b;
   --brand-ink: #13283d;
@@ -62,7 +62,7 @@
   --popover-foreground: #f4e4c1;
   --primary: #ff6b5c;
   --primary-foreground: #ffffff;
-  --secondary: #2ec4b6;
+  --secondary: #2f9fd0;
   --secondary-foreground: #0c1a1f;
   --muted: #21383f;
   --muted-foreground: #b8c4be;
@@ -104,8 +104,8 @@
   --color-brand-sand-soft: var(--brand-sand-soft);
   --color-brand-coral: var(--brand-coral);
   --color-brand-coral-dark: var(--brand-coral-dark);
-  --color-brand-turquoise: var(--brand-turquoise);
-  --color-brand-turquoise-dark: var(--brand-turquoise-dark);
+  --color-brand-sky: var(--brand-sky);
+  --color-brand-sky-dark: var(--brand-sky-dark);
   --color-brand-sun: var(--brand-sun);
   --color-brand-ocean: var(--brand-ocean);
   --color-brand-ink: var(--brand-ink);
@@ -117,9 +117,11 @@
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
 
-  /* Schriften – @nuxt/fonts lädt diese automatisch von Google Fonts */
+  /* Schriften – @nuxt/fonts lädt diese automatisch von Google Fonts.
+     Display: „Bricolage Grotesque" – charakterstark, modern, mit Kante.
+     Body: Nunito – freundlich-entspannt, passt zum Strand-Ton. */
   --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Rubik", "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Rubik", ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
@@ -133,8 +135,9 @@
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.01em;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
   }
 }
 
@@ -200,7 +203,7 @@
 .prose-legal ol { list-style: decimal; }
 .prose-legal li { margin-bottom: 0.25rem; }
 .prose-legal a {
-  color: var(--brand-turquoise-dark);
+  color: var(--brand-sky-dark);
   text-decoration: underline;
   text-underline-offset: 2px;
 }

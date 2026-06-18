@@ -23,10 +23,15 @@ const props = withDefaults(
 )
 const emit = defineEmits<{ book: [number[]]; cancel: [string] }>()
 
-// ---- Mehrfachauswahl per Ziehen (Maus & Touch) ----------------------------
+// ---- Mehrfachauswahl: Maus = sofort ziehen, Touch = halten, dann ziehen ----
 const byHour = computed(() => new Map(props.slots.map((s) => [s.hour, s])))
 const anchor = ref<number | null>(null)
 const hoverHour = ref<number | null>(null)
+// Während einer aktiven Touch-Auswahl: Seiten-Scrollen unterbinden.
+const lockScroll = ref(false)
+
+const HOLD_MS = 320 // so lange halten, bis der Auswahl-Modus startet
+const MOVE_CANCEL = 12 // Bewegt sich der Finger vorher mehr, ist es ein Scroll
 
 function selectable(hour: number): boolean {
   const s = byHour.value.get(hour)
@@ -46,31 +51,119 @@ const selectedHours = computed<number[]>(() => {
 })
 const selectedSet = computed(() => new Set(selectedHours.value))
 
-function onDown(hour: number, e: PointerEvent) {
-  if (!selectable(hour)) return
-  e.preventDefault()
+function hourAt(x: number, y: number): number | null {
+  const cell = (document.elementFromPoint(x, y) as HTMLElement | null)?.closest('[data-hour]') as HTMLElement | null
+  if (!cell) return null
+  const h = Number(cell.dataset.hour)
+  return Number.isNaN(h) ? null : h
+}
+
+function beginSelect(hour: number) {
   anchor.value = hour
   hoverHour.value = hour
-  window.addEventListener('pointerup', onUp)
-  window.addEventListener('pointercancel', reset)
 }
-function onMove(e: PointerEvent) {
-  if (anchor.value == null) return
-  const cell = (document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null)?.closest('[data-hour]') as HTMLElement | null
-  const h = cell ? Number(cell.dataset.hour) : Number.NaN
-  if (!Number.isNaN(h)) hoverHour.value = h
-}
-function onUp() {
+
+function commit() {
   const hours = [...selectedHours.value]
   reset()
   if (hours.length) emit('book', hours)
 }
+
 function reset() {
   anchor.value = null
   hoverHour.value = null
-  window.removeEventListener('pointerup', onUp)
-  window.removeEventListener('pointercancel', reset)
+  lockScroll.value = false
+  window.removeEventListener('pointermove', onMouseMove)
+  window.removeEventListener('pointerup', onMouseUp)
+  document.removeEventListener('touchmove', onTouchMove)
+  document.removeEventListener('touchend', onTouchEnd)
+  document.removeEventListener('touchcancel', onTouchEnd)
+  clearHold()
 }
+
+// ---- Maus -----------------------------------------------------------------
+function onMouseMove(e: PointerEvent) {
+  if (anchor.value == null) return
+  const h = hourAt(e.clientX, e.clientY)
+  if (h != null) hoverHour.value = h
+}
+function onMouseUp() {
+  commit()
+}
+
+// ---- Touch ----------------------------------------------------------------
+let holdTimer: ReturnType<typeof setTimeout> | null = null
+let touchHour: number | null = null
+let touchStartX = 0
+let touchStartY = 0
+let touchSelecting = false
+let touchAborted = false
+
+function clearHold() {
+  if (holdTimer) { clearTimeout(holdTimer); holdTimer = null }
+}
+
+function beginTouch(hour: number, e: PointerEvent) {
+  touchHour = hour
+  touchStartX = e.clientX
+  touchStartY = e.clientY
+  touchSelecting = false
+  touchAborted = false
+  document.addEventListener('touchmove', onTouchMove, { passive: false })
+  document.addEventListener('touchend', onTouchEnd)
+  document.addEventListener('touchcancel', onTouchEnd)
+  holdTimer = setTimeout(() => {
+    holdTimer = null
+    touchSelecting = true
+    lockScroll.value = true
+    if (touchHour != null) beginSelect(touchHour)
+    navigator.vibrate?.(15)
+  }, HOLD_MS)
+}
+
+function onTouchMove(e: TouchEvent) {
+  const t = e.touches[0]
+  if (!t) return
+  if (!touchSelecting) {
+    // Noch im Halte-Fenster: deutliche Bewegung = Scroll-Absicht → abbrechen.
+    if (Math.abs(t.clientX - touchStartX) > MOVE_CANCEL || Math.abs(t.clientY - touchStartY) > MOVE_CANCEL) {
+      touchAborted = true
+      clearHold()
+    }
+    return // nicht preventDefault → Seite darf scrollen
+  }
+  // Auswahl-Modus: Scrollen blockieren und Block erweitern.
+  e.preventDefault()
+  const h = hourAt(t.clientX, t.clientY)
+  if (h != null) hoverHour.value = h
+}
+
+function onTouchEnd() {
+  if (touchSelecting) {
+    commit()
+  } else if (!touchAborted && touchHour != null) {
+    // Kurzer Tap ohne Halten → einzelnen Slot buchen.
+    const hour = touchHour
+    reset()
+    emit('book', [hour])
+  } else {
+    reset()
+  }
+}
+
+// ---- Einstieg (Pointer) ---------------------------------------------------
+function onDown(hour: number, e: PointerEvent) {
+  if (!selectable(hour)) return
+  if (e.pointerType === 'mouse') {
+    e.preventDefault()
+    beginSelect(hour)
+    window.addEventListener('pointermove', onMouseMove)
+    window.addEventListener('pointerup', onMouseUp)
+  } else {
+    beginTouch(hour, e)
+  }
+}
+
 onBeforeUnmount(reset)
 </script>
 
@@ -83,8 +176,7 @@ onBeforeUnmount(reset)
     <div
       v-else
       class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
-      :class="{ 'touch-none select-none': interactive }"
-      @pointermove="onMove"
+      :class="{ 'select-none': interactive, 'touch-none': lockScroll }"
     >
       <template v-for="s in slots" :key="s.hour">
         <!-- Frei + buchbar -->
@@ -203,7 +295,7 @@ onBeforeUnmount(reset)
     </div>
 
     <p v-if="interactive" class="mt-3 text-center text-xs text-muted-foreground">
-      Tipp: Über mehrere freie Slots ziehen, um gleich mehrere Stunden zu buchen.
+      Tipp: Für mehrere Stunden über die freien Slots ziehen – am Handy einen Slot kurz halten, dann ziehen.
     </p>
   </div>
 </template>

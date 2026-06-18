@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { toast } from 'vue-sonner'
 
 definePageMeta({ middleware: 'auth' })
@@ -17,20 +19,33 @@ const { data, pending, refresh } = await useFetch('/api/bookings', {
 
 type DialogState =
   | { open: false }
-  | { open: true; mode: 'book'; hour: number; label: string }
+  | { open: true; mode: 'book'; hours: number[]; label: string }
   | { open: true; mode: 'cancel'; bookingId: string; label: string }
 
 const dialog = ref<DialogState>({ open: false })
+const note = ref('')
 const working = ref(false)
 
-function askBook(hour: number) {
-  const slot = data.value?.slots.find((s) => s.hour === hour)
-  if (!slot) return
-  dialog.value = { open: true, mode: 'book', hour, label: slot.label }
+/** Beschriftung einer Slot-Range, z. B. "18:00 – 21:00 (3 Std.)". */
+function rangeLabel(hours: number[]): string {
+  const slots = data.value?.slots ?? []
+  const first = slots.find((s) => s.hour === hours[0])
+  const last = slots.find((s) => s.hour === hours[hours.length - 1])
+  if (!first || !last) return ''
+  const from = first.label.split(' – ')[0]
+  const to = last.label.split(' – ')[1]
+  return hours.length > 1 ? `${from} – ${to} (${hours.length} Std.)` : `${from} – ${to}`
+}
+
+function askBook(hours: number[]) {
+  if (!hours.length) return
+  note.value = ''
+  dialog.value = { open: true, mode: 'book', hours, label: rangeLabel(hours) }
 }
 function askCancel(bookingId: string) {
-  const slot = data.value?.slots.find((s) => s.bookingId === bookingId)
-  dialog.value = { open: true, mode: 'cancel', bookingId, label: slot?.label ?? '' }
+  // Eine Buchung kann mehrere Stunden umfassen – alle Slots desselben Eintrags zusammenfassen.
+  const hours = (data.value?.slots ?? []).filter((s) => s.bookingId === bookingId).map((s) => s.hour).sort((a, b) => a - b)
+  dialog.value = { open: true, mode: 'cancel', bookingId, label: rangeLabel(hours) }
 }
 
 async function confirm() {
@@ -38,8 +53,11 @@ async function confirm() {
   working.value = true
   try {
     if (dialog.value.mode === 'book') {
-      await $fetch('/api/bookings', { method: 'POST', body: { date: date.value, hour: dialog.value.hour } })
-      toast.success('Platz reserviert. Viel Spaß!')
+      await $fetch('/api/bookings', {
+        method: 'POST',
+        body: { date: date.value, hours: dialog.value.hours, note: note.value.trim() || undefined },
+      })
+      toast.success(dialog.value.hours.length > 1 ? 'Slots reserviert. Viel Spaß!' : 'Platz reserviert. Viel Spaß!')
     } else {
       await $fetch(`/api/bookings/${dialog.value.bookingId}`, { method: 'DELETE' })
       toast.success('Reservierung storniert.')
@@ -93,6 +111,19 @@ async function confirm() {
             </template>
           </DialogDescription>
         </DialogHeader>
+
+        <div v-if="dialog.open && dialog.mode === 'book'" class="space-y-2">
+          <Label for="booking-note">Notiz <span class="font-normal text-muted-foreground">(optional)</span></Label>
+          <Input
+            id="booking-note"
+            v-model="note"
+            maxlength="140"
+            placeholder="z. B. Training, Turniervorbereitung, offen für Mitspieler …"
+            @keydown.enter.prevent="confirm"
+          />
+          <p class="text-xs text-muted-foreground">Sehen andere Mitglieder im Belegungsplan.</p>
+        </div>
+
         <DialogFooter>
           <Button variant="ghost" :disabled="working" @click="dialog = { open: false }">Abbrechen</Button>
           <Button

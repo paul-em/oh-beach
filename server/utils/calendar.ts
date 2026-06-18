@@ -13,6 +13,7 @@ export interface CourtEvent {
   summary: string
   memberEmail?: string
   courtId?: string
+  note?: string
 }
 
 const APP_TAG = 'oh-beach'
@@ -70,6 +71,7 @@ export async function listCourtEvents(timeMin: string, timeMax: string): Promise
     summary: it.summary || 'Reserviert',
     memberEmail: it.extendedProperties?.private?.memberEmail,
     courtId: it.extendedProperties?.private?.courtId,
+    note: it.extendedProperties?.private?.note || undefined,
   }))
 }
 
@@ -89,6 +91,7 @@ export async function getCourtEvent(id: string): Promise<CourtEvent | null> {
       summary: it.summary || 'Reserviert',
       memberEmail: it.extendedProperties?.private?.memberEmail,
       courtId: it.extendedProperties?.private?.courtId,
+      note: it.extendedProperties?.private?.note || undefined,
     }
   } catch {
     return null
@@ -101,9 +104,12 @@ export async function createCourtEvent(input: {
   memberEmail: string
   memberName: string
   courtId?: string
+  note?: string
 }): Promise<CourtEvent> {
   const courtId = input.courtId ?? '1'
-  const summary = `Reserviert – ${input.memberName}`
+  const note = input.note?.trim() || undefined
+  // Notiz im Kalender-Titel sichtbar machen, damit sie auch direkt im Google Calendar lesbar ist.
+  const summary = note ? `Reserviert – ${input.memberName}: ${note}` : `Reserviert – ${input.memberName}`
   if (!isCalendarConfigured()) {
     const ev: CourtEvent = {
       id: randomUUID(),
@@ -112,6 +118,7 @@ export async function createCourtEvent(input: {
       summary,
       memberEmail: input.memberEmail,
       courtId,
+      note,
     }
     devEvents.push(ev)
     return ev
@@ -122,11 +129,12 @@ export async function createCourtEvent(input: {
     calendarId: c.googleCalendarId,
     requestBody: {
       summary,
-      description: `Platzreservierung über oh-beach (${input.memberEmail})`,
+      description: [`Platzreservierung über oh-beach (${input.memberEmail})`, note && `Notiz: ${note}`]
+        .filter(Boolean).join('\n'),
       start: { dateTime: input.startISO },
       end: { dateTime: input.endISO },
       extendedProperties: {
-        private: { memberEmail: input.memberEmail, courtId, app: APP_TAG },
+        private: { memberEmail: input.memberEmail, courtId, app: APP_TAG, ...(note ? { note } : {}) },
       },
     },
   })
@@ -138,6 +146,7 @@ export async function createCourtEvent(input: {
     summary,
     memberEmail: input.memberEmail,
     courtId,
+    note,
   }
 }
 

@@ -42,7 +42,10 @@ async function cancel(id: string) {
     <div v-else class="space-y-3">
       <Card v-for="b in data.bookings" :key="b.id">
         <CardContent class="flex items-center justify-between gap-4 py-4">
-          <span class="font-display font-semibold capitalize">{{ formatBookingWhen(b.startISO, b.endISO) }}</span>
+          <span class="min-w-0">
+            <span class="block font-display font-semibold capitalize">{{ formatBookingWhen(b.startISO, b.endISO) }}</span>
+            <span v-if="b.note" class="block truncate text-sm text-muted-foreground" :title="b.note">{{ b.note }}</span>
+          </span>
           <Button variant="destructive" size="sm" :disabled="cancelling === b.id" @click="cancel(b.id)">
             {{ cancelling === b.id ? '…' : 'Stornieren' }}
           </Button>

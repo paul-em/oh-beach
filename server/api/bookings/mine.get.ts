@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   const events = await listCourtEvents(timeMin, timeMax)
   const bookings = events
     .filter((e) => (e.memberEmail || '').toLowerCase() === email)
-    .map((e) => ({ id: e.id, startISO: e.startISO, endISO: e.endISO }))
+    .map((e) => ({ id: e.id, startISO: e.startISO, endISO: e.endISO, note: e.note }))
     .sort((a, b) => a.startISO.localeCompare(b.startISO))
 
   return { bookings }

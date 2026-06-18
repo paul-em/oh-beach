@@ -4,8 +4,11 @@
  * und die Namen der Reservierenden offengelegt (bookedBy). Für Gäste bleibt nur
  * der Status sichtbar – ohne Namen.
  */
-function bookedByName(summary: string): string {
-  return summary.replace(/^Reserviert\s*[–-]\s*/, '').trim() || 'Reserviert'
+function bookedByName(summary: string, note?: string): string {
+  let name = summary.replace(/^Reserviert\s*[–-]\s*/, '').trim()
+  // Notiz steckt im Titel als "Name: Notiz" – für die Namensanzeige wieder entfernen.
+  if (note && name.endsWith(`: ${note}`)) name = name.slice(0, -(`: ${note}`).length).trim()
+  return name || 'Reserviert'
 }
 
 export default defineEventHandler(async (event) => {
@@ -32,7 +35,10 @@ export default defineEventHandler(async (event) => {
     const past = !isBookable(s.startISO)
     const status: 'free' | 'busy' | 'past' = booked ? 'busy' : past ? 'past' : 'free'
     const bookedBy = loggedIn && booked
-      ? overlapping.map((e) => bookedByName(e.summary)).join(', ')
+      ? overlapping.map((e) => bookedByName(e.summary, e.note)).join(', ')
+      : undefined
+    const note = loggedIn && booked
+      ? overlapping.map((e) => e.note).filter(Boolean).join(' · ') || undefined
       : undefined
     return {
       hour: s.hour,
@@ -42,6 +48,7 @@ export default defineEventHandler(async (event) => {
       mine: Boolean(own),
       bookingId: own?.id,
       bookedBy,
+      note,
       weather: weather.hours[s.hour] ?? null,
     }
   })

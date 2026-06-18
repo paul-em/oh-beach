@@ -29,6 +29,28 @@ export function formatDateLong(dateStr: string): string {
   }).format(dt)
 }
 
+/** Wochentag-Kürzel eines YYYY-MM-DD-Datums, z. B. "Fr". */
+export function formatWeekdayShort(dateStr: string): string {
+  const p = dateStr.split('-')
+  const dt = new Date(Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2]), 12))
+  return new Intl.DateTimeFormat('de-AT', { weekday: 'short', timeZone: 'UTC' }).format(dt).replace(/\.$/, '')
+}
+
+/** Tag im Monat (1–31) eines YYYY-MM-DD-Datums. */
+export function dayOfMonth(dateStr: string): number {
+  return Number(dateStr.split('-')[2])
+}
+
+/** Liste aller YYYY-MM-DD-Daten von `from` bis `to` (inklusive). */
+export function dateRange(from: string, to: string): string[] {
+  const out: string[] = []
+  for (let d = from; d <= to; d = addDays(d, 1)) {
+    out.push(d)
+    if (out.length > 366) break // Sicherheitsnetz
+  }
+  return out
+}
+
 /** Uhrzeit eines UTC-Instants in Vereins-Zeitzone, z. B. "18:00". */
 export function formatTime(iso: string): string {
   return new Intl.DateTimeFormat('de-AT', {

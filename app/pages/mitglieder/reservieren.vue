@@ -68,6 +68,7 @@ async function confirm() {
 
     <Card>
       <CardContent class="space-y-6 pt-6">
+        <BookingDayStrip v-model="date" :today="data?.today || date" :max-date="data?.maxDate || date" />
         <BookingDateNav v-model="date" :today="data?.today || date" :max-date="data?.maxDate || date" />
         <BookingSlotGrid
           :slots="data?.slots || []"

@@ -218,6 +218,15 @@
   );
 }
 
+/* Lesbarkeits-Aura: weicher Halo in Kartenfarbe (hell im Light-, dunkel im
+   Dark-Mode), damit Uhrzeit/Grad auf dem Wetter-Verlauf klar lesbar bleiben. */
+.slot-legible {
+  text-shadow:
+    0 0 2px color-mix(in srgb, var(--card) 96%, transparent),
+    0 0 6px color-mix(in srgb, var(--card) 85%, transparent),
+    0 1px 1px color-mix(in srgb, var(--card) 96%, transparent);
+}
+
 /* Diagonale Schraffur für belegte Slots – signalisiert eindeutig „nicht frei". */
 .slot-hatch {
   background-image: repeating-linear-gradient(

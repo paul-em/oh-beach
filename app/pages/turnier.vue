@@ -48,10 +48,10 @@ const highlights = [
     <section class="sand-glow relative overflow-hidden bg-brand-sand-soft">
       <div class="mx-auto w-full max-w-6xl px-4 py-20 md:py-28">
         <div class="max-w-2xl space-y-6">
-          <span class="inline-flex items-center gap-2 rounded-full bg-brand-sun/30 px-3 py-1 text-sm font-semibold text-brand-ink">
-            <Trophy class="size-4" /> Turnier · 22.08.2026
-          </span>
-          <h1 class="text-4xl leading-tight sm:text-5xl lg:text-6xl">
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-brand-coral">
+            Turnier · 22. August 2026
+          </p>
+          <h1 class="text-5xl sm:text-6xl lg:text-7xl">
             SilberHolz<br /><span class="text-brand-coral">Beach Open 2026</span>
           </h1>
           <p class="max-w-md text-lg text-muted-foreground">
@@ -68,12 +68,6 @@ const highlights = [
               <a href="#infos">Alle Infos</a>
             </Button>
           </div>
-          <p class="flex flex-wrap gap-2 text-sm text-muted-foreground">
-            <span class="rounded-full bg-background px-2 py-0.5">#mixed</span>
-            <span class="rounded-full bg-background px-2 py-0.5">#hobby</span>
-            <span class="rounded-full bg-background px-2 py-0.5">#fun</span>
-            <span class="rounded-full bg-background px-2 py-0.5">#ooe</span>
-          </p>
 
           <div class="pt-4">
             <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">

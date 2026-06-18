@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Users, CalendarDays, MapPin, ArrowRight, Clock, Trophy } from '@lucide/vue'
+import { Users, CalendarDays, MapPin, ArrowRight, Clock, Trophy, ChevronDown } from '@lucide/vue'
 
 const config = useRuntimeConfig()
 const joinUrl = computed(() => config.public.joinFormUrl || '#mitglied-werden')
@@ -177,9 +177,11 @@ const faqs = [
         <h2 class="text-3xl">Mitglied werden</h2>
         <p class="mt-3 text-muted-foreground">In ein paar entspannten Schritten Teil des Vereins.</p>
       </div>
-      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <div v-for="s in steps" :key="s.n" class="space-y-3">
-          <div class="flex size-11 items-center justify-center rounded-full bg-brand-coral font-display text-lg font-bold text-primary-foreground">
+      <div class="relative grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- durchgehende Linie hinter den Nummern (nur Desktop) -->
+        <div class="absolute inset-x-0 top-5 hidden h-px bg-brand-coral/25 lg:block" aria-hidden="true"></div>
+        <div v-for="s in steps" :key="s.n" class="relative space-y-3">
+          <div class="flex size-10 items-center justify-center rounded-full bg-brand-coral font-display text-lg font-bold text-primary-foreground ring-8 ring-background">
             {{ s.n }}
           </div>
           <h3 class="text-xl">{{ s.title }}</h3>
@@ -221,18 +223,23 @@ const faqs = [
       <div class="mb-12 max-w-2xl">
         <h2 class="text-3xl">Häufige Fragen</h2>
       </div>
-      <div class="grid gap-6 md:grid-cols-3">
-        <div v-for="f in faqs" :key="f.q" class="rounded-xl border border-border/60 bg-background p-6">
-          <h3 class="text-lg">{{ f.q }}</h3>
-          <p class="mt-2 text-muted-foreground">{{ f.a }}</p>
-          <NuxtLink
-            v-if="f.link"
-            :to="f.link.to"
-            class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-sky-dark hover:underline"
-          >
-            {{ f.link.label }} <ArrowRight class="size-4" />
-          </NuxtLink>
-        </div>
+      <div class="max-w-3xl divide-y divide-border/60 overflow-hidden rounded-xl border border-border/60 bg-background">
+        <details v-for="f in faqs" :key="f.q" class="group px-6">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-display text-lg font-semibold marker:hidden">
+            {{ f.q }}
+            <ChevronDown class="size-5 shrink-0 text-brand-coral transition-transform duration-200 group-open:rotate-180" />
+          </summary>
+          <div class="pb-5 text-muted-foreground">
+            <p>{{ f.a }}</p>
+            <NuxtLink
+              v-if="f.link"
+              :to="f.link.to"
+              class="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-sky-dark hover:underline"
+            >
+              {{ f.link.label }} <ArrowRight class="size-4" />
+            </NuxtLink>
+          </div>
+        </details>
       </div>
     </SiteSection>
 

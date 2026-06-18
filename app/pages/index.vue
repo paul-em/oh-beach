@@ -86,7 +86,7 @@ const faqs = [
       <!-- Faultier lugt unten rechts ins Bild -->
       <BrandFaultierMascot
         :size="240"
-        class="pointer-events-none absolute -bottom-2 right-4 hidden drop-shadow-2xl lg:block"
+        class="pointer-events-none absolute -bottom-2 right-2 block h-auto w-28 drop-shadow-2xl sm:right-4 sm:w-40 lg:w-60"
       />
     </section>
 

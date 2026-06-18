@@ -14,7 +14,10 @@ export default defineEventHandler(async (event) => {
 
   const slots = generateSlots(date)
   const { timeMin, timeMax } = dayBoundsUTC(date)
-  const events = await listCourtEvents(timeMin, timeMax)
+  const [events, weather] = await Promise.all([
+    listCourtEvents(timeMin, timeMax),
+    weatherForDate(date),
+  ])
 
   const session = await getUserSession(event)
   const userEmail = session?.user?.email?.toLowerCase()
@@ -39,6 +42,7 @@ export default defineEventHandler(async (event) => {
       mine: Boolean(own),
       bookingId: own?.id,
       bookedBy,
+      weather: weather.hours[s.hour] ?? null,
     }
   })
 
@@ -47,6 +51,7 @@ export default defineEventHandler(async (event) => {
     today: todayStr(),
     maxDate: maxDateStr(),
     slots: result,
+    weather: weather.day,
     config: { openHour: BOOKING.openHour, closeHour: BOOKING.closeHour, advanceDays: BOOKING.advanceDays },
   }
 })

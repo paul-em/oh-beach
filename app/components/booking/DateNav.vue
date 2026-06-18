@@ -2,7 +2,15 @@
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from '@lucide/vue'
 
-const props = defineProps<{ modelValue: string; today: string; maxDate: string }>()
+interface DayWeather {
+  kind: 'clear' | 'partly' | 'cloudy' | 'fog' | 'rain' | 'snow' | 'storm'
+  tempMax: number
+  tempMin: number
+  windMax: number
+  windy: boolean
+}
+
+const props = defineProps<{ modelValue: string; today: string; maxDate: string; weather?: DayWeather | null }>()
 const emit = defineEmits<{ 'update:modelValue': [string] }>()
 
 const canPrev = computed(() => props.modelValue > props.today)
@@ -18,8 +26,9 @@ function go(n: number) {
     <Button variant="outline" size="icon" :disabled="!canPrev" aria-label="Vorheriger Tag" @click="go(-1)">
       <ChevronLeft class="size-4" />
     </Button>
-    <div class="text-center">
+    <div class="flex flex-col items-center gap-1.5 text-center">
       <p class="font-display text-lg font-semibold capitalize">{{ formatDateLong(modelValue) }}</p>
+      <BookingWeatherBadge v-if="weather" :weather="weather" />
       <button
         v-if="modelValue !== today"
         class="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"

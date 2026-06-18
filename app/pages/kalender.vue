@@ -31,9 +31,9 @@ const { data, pending } = await useFetch('/api/bookings', {
       <BrandFaultierMascot :size="120" class="hidden shrink-0 drop-shadow-lg sm:block" />
     </header>
 
-    <Card>
+    <Card :data-weather="data?.weather?.kind" class="weather-tint">
       <CardContent class="space-y-6 pt-6">
-        <BookingDateNav v-model="date" :today="data?.today || date" :max-date="data?.maxDate || date" />
+        <BookingDateNav v-model="date" :today="data?.today || date" :max-date="data?.maxDate || date" :weather="data?.weather" />
         <BookingSlotGrid :slots="data?.slots || []" :pending="pending" />
       </CardContent>
     </Card>

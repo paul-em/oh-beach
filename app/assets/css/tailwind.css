@@ -208,9 +208,14 @@
   transition: background-color 0.5s ease;
 }
 
-/* Voller Wetter-Verlauf – Hintergrundlage hinter dem Slot-Inhalt. */
+/* Dezenter Wetter-Verlauf hinter dem Slot-Inhalt – Wetterfarben zur Kartenfarbe
+   hin abgemischt, damit der Inhalt klar lesbar bleibt. */
 .weather-surface {
-  background-image: linear-gradient(155deg, var(--w-from), var(--w-to));
+  background-image: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--w-from) 40%, var(--card)),
+    color-mix(in srgb, var(--w-to) 40%, var(--card))
+  );
 }
 
 /* Fließtext-Styling für Rechtsseiten (Statuten/Impressum/Datenschutz) */

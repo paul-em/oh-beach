@@ -83,7 +83,7 @@ const highlights = [
               <img
                 src="/Silberholz-logo.png"
                 alt="SilberHolz – Hauptsponsor"
-                class="h-12 w-auto rounded-md shadow-sm transition-transform hover:scale-105 sm:h-14"
+                class="h-12 w-auto transition-transform hover:scale-105 sm:h-14"
               />
             </a>
           </div>
@@ -178,7 +178,7 @@ const highlights = [
           <img
             src="/Silberholz-logo.png"
             alt="SilberHolz – Hauptsponsor der Beach Open"
-            class="w-full rounded-lg shadow-md transition-transform hover:scale-[1.02]"
+            class="w-full shadow-md transition-transform hover:scale-[1.02]"
           />
         </a>
         <p class="max-w-xl text-muted-foreground">

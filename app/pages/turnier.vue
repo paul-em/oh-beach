@@ -74,6 +74,19 @@ const highlights = [
             <span class="rounded-full bg-background px-2 py-0.5">#fun</span>
             <span class="rounded-full bg-background px-2 py-0.5">#ooe</span>
           </p>
+
+          <div class="pt-4">
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Präsentiert von unserem Hauptsponsor
+            </p>
+            <a href="https://www.silberholz.at/" target="_blank" rel="noopener" aria-label="Zur Website von SilberHolz">
+              <img
+                src="/Silberholz-logo.png"
+                alt="SilberHolz – Hauptsponsor"
+                class="h-12 w-auto rounded-md shadow-sm transition-transform hover:scale-105 sm:h-14"
+              />
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -154,6 +167,30 @@ const highlights = [
             </Button>
           </CardContent>
         </Card>
+      </div>
+    </SiteSection>
+
+    <!-- Hauptsponsor -->
+    <SiteSection>
+      <div class="flex flex-col items-center gap-6 text-center">
+        <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Unser Hauptsponsor</p>
+        <a href="https://www.silberholz.at/" target="_blank" rel="noopener" class="w-full max-w-2xl" aria-label="Zur Website von SilberHolz">
+          <img
+            src="/Silberholz-logo.png"
+            alt="SilberHolz – Hauptsponsor der Beach Open"
+            class="w-full rounded-lg shadow-md transition-transform hover:scale-[1.02]"
+          />
+        </a>
+        <p class="max-w-xl text-muted-foreground">
+          <span class="font-semibold text-foreground">SilberHolz</span> ist eine Tischlerei aus der
+          Region, die nachhaltig gefertigte Küchen und Möbel für Haus und Garten herstellt –
+          getreu dem Motto „Natürlich SilberHolz“. Danke, dass ihr unser Turnier möglich macht!
+        </p>
+        <Button as-child variant="secondary">
+          <a href="https://www.silberholz.at/" target="_blank" rel="noopener">
+            Zur Website von SilberHolz <ExternalLink class="size-4" />
+          </a>
+        </Button>
       </div>
     </SiteSection>
 

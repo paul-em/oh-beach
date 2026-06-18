@@ -226,10 +226,10 @@ onBeforeUnmount(reset)
           v-else-if="s.status === 'busy' && s.mine"
           :data-hour="s.hour"
           :data-weather="s.weather?.kind"
-          class="relative h-20 overflow-hidden rounded-xl border-2 border-brand-coral/60"
+          class="relative h-20 overflow-hidden rounded-xl border-2 border-brand-coral"
         >
-          <span class="weather-surface absolute inset-0 opacity-70" />
-          <span class="absolute inset-0 bg-brand-coral/15" />
+          <span class="weather-surface absolute inset-0 opacity-40" />
+          <span class="absolute inset-0 bg-brand-coral/25" />
           <BookingWeatherGlyph :kind="s.weather?.kind" :stroke-width="1.25" class="pointer-events-none absolute -bottom-4 -right-3 size-24 text-foreground/15" />
           <Button
             v-if="interactive && s.bookingId"
@@ -261,8 +261,9 @@ onBeforeUnmount(reset)
           :data-weather="s.weather?.kind"
           class="relative h-20 overflow-hidden rounded-xl border border-border"
         >
-          <span class="weather-surface absolute inset-0 opacity-60" />
-          <span class="absolute inset-0 bg-foreground/10" />
+          <span class="weather-surface absolute inset-0 opacity-30" />
+          <span class="absolute inset-0 bg-background/55" />
+          <span class="slot-hatch absolute inset-0" />
           <BookingWeatherGlyph :kind="s.weather?.kind" :stroke-width="1.25" class="pointer-events-none absolute -bottom-4 -right-3 size-24 text-foreground/15" />
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
             <span class="flex w-full items-start justify-between gap-2">

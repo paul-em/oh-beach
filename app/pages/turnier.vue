@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   CalendarDays, Clock, MapPin, Trophy, Users, Beer, Utensils,
   ArrowRight, ExternalLink, Mail, Phone, Ticket,
@@ -91,19 +91,19 @@ const highlights = [
         <h2 class="text-3xl">Die Eckdaten</h2>
         <p class="mt-3 text-muted-foreground">Das Wichtigste auf einen Blick.</p>
       </div>
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <dl class="grid gap-px overflow-hidden rounded-xl border border-border/60 bg-border/60 sm:grid-cols-2 lg:grid-cols-3">
         <div
           v-for="f in facts"
           :key="f.label"
-          class="flex items-start gap-4 rounded-xl border border-border/60 bg-background p-5"
+          class="flex items-start gap-4 bg-background p-6"
         >
           <component :is="f.icon" class="mt-0.5 size-6 shrink-0 text-brand-coral" />
           <div>
-            <p class="text-sm font-semibold text-muted-foreground">{{ f.label }}</p>
-            <p class="font-semibold">{{ f.value }}</p>
+            <dt class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{{ f.label }}</dt>
+            <dd class="mt-0.5 font-semibold">{{ f.value }}</dd>
           </div>
         </div>
-      </div>
+      </dl>
     </SiteSection>
 
     <!-- Highlights -->
@@ -126,41 +126,39 @@ const highlights = [
     </SiteSection>
 
     <!-- Spielmodus -->
-    <SiteSection>
+    <SiteSection tone="navy">
       <div class="grid items-start gap-10 md:grid-cols-2">
         <div class="space-y-4">
           <h2 class="text-3xl">Spielmodus</h2>
-          <p class="text-muted-foreground">
+          <p class="text-white/80">
             Gespielt wird 4 vs. 4 Mixed – pro Team muss mindestens eine Dame am Feld stehen.
             Bei maximal 20 Teams starten wir mit einer Gruppenphase (modified Pool Play),
             die zufällig ausgelost wird. Danach geht es in die Doppel-KO-Phase, gesetzt
             nach Spiel-, Satz- und Punkteverhältnis.
           </p>
-          <p class="text-muted-foreground">
+          <p class="text-white/80">
             Wir versuchen, jedes Team mindestens einmal am Beachvolleyballplatz spielen zu
             lassen – wir bitten aber um Rücksicht, wenn sich mit Beach- und Rasenplätzen
             nicht alles optimal ausgeht.
           </p>
         </div>
-        <Card class="border-brand-sky/30 bg-brand-sky/5">
-          <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <MapPin class="size-5 text-brand-sky-dark" /> Veranstaltungsort
-            </CardTitle>
-            <CardDescription>Gegenüber vom Freibad Offenhausen</CardDescription>
-          </CardHeader>
-          <CardContent class="space-y-4 text-muted-foreground">
+        <div class="rounded-xl border border-white/15 bg-white/5 p-6">
+          <h3 class="flex items-center gap-2 text-xl">
+            <MapPin class="size-5 text-brand-sky" /> Veranstaltungsort
+          </h3>
+          <p class="mt-1 text-sm text-white/60">Gegenüber vom Freibad Offenhausen</p>
+          <div class="mt-4 space-y-4 text-white/80">
             <p>Schulstraße 6, 4625 Offenhausen, Oberösterreich</p>
             <p class="text-sm">
               WCs sind beim Fußballplatz nebenan vorhanden (Gäste-WC 1 + Gäste-WC 2).
             </p>
-            <Button as-child variant="secondary" size="sm">
+            <Button as-child size="sm" variant="outline" class="border-white/40 bg-white/5 text-white hover:bg-white/15 hover:text-white">
               <a href="https://maps.google.com/?cid=16346363461618422179" target="_blank" rel="noopener">
                 In Google Maps öffnen <ExternalLink class="size-4" />
               </a>
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </SiteSection>
 

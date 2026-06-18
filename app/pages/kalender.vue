@@ -18,11 +18,17 @@ const { data, pending } = await useFetch('/api/bookings', {
 
 <template>
   <div class="mx-auto w-full max-w-4xl px-4 py-12">
-    <header class="mb-8 max-w-2xl">
-      <h1 class="text-4xl">Platzbelegung</h1>
-      <p class="mt-3 text-muted-foreground">
-        Hier siehst du, wann der Platz frei ist. Reservieren können angemeldete Mitglieder.
-      </p>
+    <header class="mb-8 flex items-end justify-between gap-6">
+      <div class="max-w-2xl">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-brand-coral">
+          Unser Platz · Offenhausen
+        </p>
+        <h1 class="mt-3 text-4xl sm:text-5xl">Platzbelegung</h1>
+        <p class="mt-3 text-muted-foreground">
+          Hier siehst du, wann der Platz frei ist. Reservieren können angemeldete Mitglieder.
+        </p>
+      </div>
+      <BrandFaultierMascot :size="120" class="hidden shrink-0 drop-shadow-lg sm:block" />
     </header>
 
     <Card>

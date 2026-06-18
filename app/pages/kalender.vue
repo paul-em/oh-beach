@@ -8,6 +8,13 @@ useSeoMeta({
 })
 
 const { loggedIn } = useUserSession()
+
+// Eingeloggte Mitglieder brauchen keine reine Lese-Ansicht – direkt zur Reservierung (Datum mitnehmen).
+const route = useRoute()
+if (loggedIn.value) {
+  await navigateTo({ path: '/mitglieder/reservieren', query: route.query })
+}
+
 const date = useDateParam()
 
 const { data, pending } = await useFetch('/api/bookings', {

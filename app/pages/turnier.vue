@@ -216,18 +216,11 @@ const highlights = [
 
       <div class="mt-8 grid gap-4 sm:grid-cols-2">
         <a
-          href="mailto:beachen.offenhausen@gmail.com"
+          href="mailto:turnier@oh-beach.at"
           class="flex items-center gap-3 rounded-xl border border-border/60 bg-background p-5 transition-colors hover:border-brand-coral"
         >
           <Mail class="size-5 text-brand-coral" />
-          <span class="font-semibold">beachen.offenhausen@gmail.com</span>
-        </a>
-        <a
-          href="tel:+436605024444"
-          class="flex items-center gap-3 rounded-xl border border-border/60 bg-background p-5 transition-colors hover:border-brand-coral"
-        >
-          <Phone class="size-5 text-brand-coral" />
-          <span class="font-semibold">+43 660 5024444</span>
+          <span class="font-semibold">turnier@oh-beach.at</span>
         </a>
       </div>
     </SiteSection>

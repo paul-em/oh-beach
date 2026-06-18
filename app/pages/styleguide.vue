@@ -82,7 +82,7 @@ const semanticColors = [
           <h3 class="text-xl">Überschrift H3</h3>
           <Separator />
           <p class="font-sans text-base">
-            Nunito · Body. Der entspannteste Beachvolleyball-Verein der Stadt –
+            Nunito · Body. Der entspannteste Beachvolleyball-Verein -
             mit Sand zwischen den Zehen und einem Faultier als Maskottchen.
           </p>
           <p class="text-sm text-muted-foreground">Sekundärtext / Muted</p>

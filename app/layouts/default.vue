@@ -85,7 +85,7 @@ async function onLogout() {
       </div>
       <div class="border-t border-white/15">
         <div class="mx-auto w-full max-w-6xl px-4 py-4 text-xs text-white/60">
-          © {{ year }} O.H.BEACH · Beachvolleyball-Verein
+          © {{ year }} O.H. Beach Volleyballverein
         </div>
       </div>
     </footer>

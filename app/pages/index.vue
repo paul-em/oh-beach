@@ -46,7 +46,7 @@ const faqs = [
     </NuxtLink>
 
     <!-- Hero -->
-    <section class="sand-grain relative overflow-hidden bg-brand-sand-soft">
+    <section class="sand-glow relative overflow-hidden bg-brand-sand-soft">
       <div class="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 py-20 md:grid-cols-2 md:py-28">
         <div class="space-y-6">
           <span class="inline-flex items-center gap-2 rounded-full bg-brand-sun/30 px-3 py-1 text-sm font-semibold text-brand-ink">
@@ -85,7 +85,7 @@ const faqs = [
     </section>
 
     <!-- Der Platz -->
-    <SiteSection alt>
+    <SiteSection>
       <div class="grid items-center gap-10 md:grid-cols-2">
         <div class="space-y-4">
           <h2 class="text-3xl">Unser Platz</h2>
@@ -135,7 +135,7 @@ const faqs = [
     </SiteSection>
 
     <!-- Beachcamp -->
-    <SiteSection alt>
+    <SiteSection>
       <div class="grid items-center gap-10 md:grid-cols-2">
         <div class="flex justify-center">
           <video
@@ -211,7 +211,7 @@ const faqs = [
     </SiteSection>
 
     <!-- FAQ -->
-    <SiteSection alt>
+    <SiteSection>
       <div class="mb-12 max-w-2xl">
         <h2 class="text-3xl">Häufige Fragen</h2>
       </div>

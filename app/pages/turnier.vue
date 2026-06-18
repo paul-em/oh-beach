@@ -45,7 +45,7 @@ const highlights = [
 <template>
   <div>
     <!-- Hero -->
-    <section class="sand-grain relative overflow-hidden bg-brand-sand-soft">
+    <section class="sand-glow relative overflow-hidden bg-brand-sand-soft">
       <div class="mx-auto w-full max-w-6xl px-4 py-20 md:py-28">
         <div class="max-w-2xl space-y-6">
           <span class="inline-flex items-center gap-2 rounded-full bg-brand-sun/30 px-3 py-1 text-sm font-semibold text-brand-ink">
@@ -113,7 +113,7 @@ const highlights = [
     </SiteSection>
 
     <!-- Highlights -->
-    <SiteSection alt>
+    <SiteSection>
       <div class="mb-10 max-w-2xl">
         <h2 class="text-3xl">Das erwartet dich</h2>
       </div>
@@ -195,7 +195,7 @@ const highlights = [
     </SiteSection>
 
     <!-- Anmeldung -->
-    <SiteSection alt id="anmeldung">
+    <SiteSection id="anmeldung">
       <Card class="bg-background">
         <CardContent class="flex flex-col items-start gap-6 p-8 md:flex-row md:items-center md:justify-between">
           <div class="max-w-xl space-y-2">

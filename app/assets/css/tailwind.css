@@ -138,10 +138,21 @@
   }
 }
 
-/* Sand-Textur: warme Körnung + Sonnenlicht-Verlauf über die Sandfläche legen.
-   Wirkt nur auf Elemente mit dieser Klasse (warme Flächen) – nicht auf Karten/Footer.
-   Reihenfolge: heller Lichtverlauf oben → dunkle Körner → helle Körner. */
+/* Sand-Textur: warme Körnung über die Sandfläche legen. Kachelt nahtlos und
+   wird darum überall (jede Section) verwendet, ohne sichtbare Kanten an den
+   Section-Übergängen. Reihenfolge: dunkle Körner → helle Körner. */
 .sand-grain {
+  background-image:
+    var(--sand-grain-dark),
+    var(--sand-grain-light);
+  background-repeat: repeat, repeat;
+  background-size: 90px 90px, 130px 130px;
+  background-position: 0 0, 40px 60px;
+}
+
+/* Zusätzlicher Sonnenlicht-Verlauf von oben. Nur für Hero-Flächen am
+   Seitenanfang – NICHT für gestapelte Sections, sonst entstehen Kanten. */
+.sand-glow {
   background-image:
     radial-gradient(135% 100% at 50% -20%, rgba(255, 223, 145, 0.45), transparent 55%),
     var(--sand-grain-dark),
@@ -152,7 +163,8 @@
 }
 
 /* Dark-Mode: keine Sonnenwärme, nur feine helle Körner als Struktur. */
-.dark .sand-grain {
+.dark .sand-grain,
+.dark .sand-glow {
   background-image: var(--sand-grain-light);
   background-repeat: repeat;
   background-size: 130px 130px;

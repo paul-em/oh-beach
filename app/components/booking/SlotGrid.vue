@@ -196,8 +196,8 @@ onBeforeUnmount(reset)
           <BookingWeatherGlyph :kind="s.weather?.kind" :stroke-width="1.25" class="pointer-events-none absolute -bottom-4 -right-3 size-24 text-foreground/15" />
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
             <span class="flex w-full items-start justify-between gap-2">
-              <span class="font-display font-semibold drop-shadow-sm">{{ s.label }}</span>
-              <span v-if="s.weather" class="text-xs font-semibold tabular-nums opacity-80">{{ s.weather.temp }}°</span>
+              <span class="min-w-0 truncate font-display font-semibold drop-shadow-sm">{{ s.label }}</span>
+              <span v-if="s.weather" class="shrink-0 text-xs font-semibold tabular-nums opacity-80">{{ s.weather.temp }}°</span>
             </span>
             <span class="text-sm font-semibold drop-shadow-sm">{{ selectedSet.has(s.hour) ? 'Ausgewählt' : 'Frei · buchen' }}</span>
           </span>
@@ -214,8 +214,8 @@ onBeforeUnmount(reset)
           <BookingWeatherGlyph :kind="s.weather?.kind" :stroke-width="1.25" class="pointer-events-none absolute -bottom-4 -right-3 size-24 text-foreground/15" />
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
             <span class="flex w-full items-start justify-between gap-2">
-              <span class="font-display font-semibold drop-shadow-sm">{{ s.label }}</span>
-              <span v-if="s.weather" class="text-xs font-semibold tabular-nums opacity-80">{{ s.weather.temp }}°</span>
+              <span class="min-w-0 truncate font-display font-semibold drop-shadow-sm">{{ s.label }}</span>
+              <span v-if="s.weather" class="shrink-0 text-xs font-semibold tabular-nums opacity-80">{{ s.weather.temp }}°</span>
             </span>
             <span class="text-sm font-semibold drop-shadow-sm">Frei</span>
           </span>
@@ -231,26 +231,25 @@ onBeforeUnmount(reset)
           <span class="weather-surface absolute inset-0 opacity-70" />
           <span class="absolute inset-0 bg-brand-coral/15" />
           <BookingWeatherGlyph :kind="s.weather?.kind" :stroke-width="1.25" class="pointer-events-none absolute -bottom-4 -right-3 size-24 text-foreground/15" />
+          <Button
+            v-if="interactive && s.bookingId"
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Stornieren"
+            class="absolute bottom-1.5 right-1.5 z-20 bg-background/60 backdrop-blur-sm hover:bg-background/80"
+            @pointerdown.stop
+            @click="emit('cancel', s.bookingId)"
+          >
+            <X class="size-4" />
+          </Button>
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
             <span class="flex w-full items-start justify-between gap-2">
-              <span class="font-display font-semibold drop-shadow-sm">{{ s.label }}</span>
-              <span v-if="s.weather" class="text-xs font-semibold tabular-nums opacity-80">{{ s.weather.temp }}°</span>
+              <span class="min-w-0 truncate font-display font-semibold drop-shadow-sm">{{ s.label }}</span>
+              <span v-if="s.weather" class="shrink-0 text-xs font-semibold tabular-nums opacity-80">{{ s.weather.temp }}°</span>
             </span>
-            <span class="flex w-full items-end justify-between gap-2">
-              <span class="min-w-0">
-                <span class="block text-sm font-semibold text-brand-coral-dark drop-shadow-sm">Deine Buchung</span>
-                <span v-if="s.note" class="block truncate text-xs text-brand-coral-dark/80" :title="s.note">{{ s.note }}</span>
-              </span>
-              <Button
-                v-if="interactive && s.bookingId"
-                variant="ghost"
-                size="icon-sm"
-                aria-label="Stornieren"
-                @pointerdown.stop
-                @click="emit('cancel', s.bookingId)"
-              >
-                <X class="size-4" />
-              </Button>
+            <span class="flex w-full min-w-0 flex-col pr-9">
+              <span class="truncate text-sm font-semibold text-brand-coral-dark drop-shadow-sm">Deine Buchung</span>
+              <span v-if="s.note" class="truncate text-xs text-brand-coral-dark/80" :title="s.note">{{ s.note }}</span>
             </span>
           </span>
         </div>
@@ -267,8 +266,8 @@ onBeforeUnmount(reset)
           <BookingWeatherGlyph :kind="s.weather?.kind" :stroke-width="1.25" class="pointer-events-none absolute -bottom-4 -right-3 size-24 text-foreground/15" />
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
             <span class="flex w-full items-start justify-between gap-2">
-              <span class="font-display font-semibold drop-shadow-sm">{{ s.label }}</span>
-              <span v-if="s.weather" class="text-xs font-semibold tabular-nums opacity-80">{{ s.weather.temp }}°</span>
+              <span class="min-w-0 truncate font-display font-semibold drop-shadow-sm">{{ s.label }}</span>
+              <span v-if="s.weather" class="shrink-0 text-xs font-semibold tabular-nums opacity-80">{{ s.weather.temp }}°</span>
             </span>
             <span class="w-full min-w-0">
               <span class="block truncate text-sm font-semibold drop-shadow-sm" :title="s.bookedBy || 'Belegt'">{{ s.bookedBy || 'Belegt' }}</span>
@@ -287,7 +286,7 @@ onBeforeUnmount(reset)
           <span class="weather-surface absolute inset-0 opacity-25" />
           <BookingWeatherGlyph :kind="s.weather?.kind" :stroke-width="1.25" class="pointer-events-none absolute -bottom-4 -right-3 size-24 text-foreground/15" />
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
-            <span class="font-display font-semibold">{{ s.label }}</span>
+            <span class="w-full truncate font-display font-semibold">{{ s.label }}</span>
             <span class="text-sm">Vorbei</span>
           </span>
         </div>

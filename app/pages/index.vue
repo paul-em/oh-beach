@@ -16,6 +16,13 @@ const trainings = [
   { day: 'Montag', time: '19:00 – 21:00', note: 'Beach Monday - Offenes Training für alle' },
 ]
 
+// Sponsoren-Logos für die Partner-Leiste (Details auf /sponsoring)
+const sponsors = [
+  { name: 'SilberHolz', logo: '/sponsoren/Silberholz-logo.png' },
+  { name: 'Poschacher', logo: '/sponsoren/Poschacher.jpeg' },
+  { name: 'Vitaminwater', logo: '/sponsoren/Vitaminwater-Logo-2016.png' },
+]
+
 const steps = [
   { n: 1, title: 'Vorbeikommen & kennenlernen', text: 'Schau am besten zuerst bei einem Trainingstermin vorbei. So lernen wir uns gegenseitig kennen und du bekommst ein Gefühl dafür, ob wir zusammenpassen.' },
   { n: 2, title: 'Anmeldeformular ausfüllen', text: 'Hat es gepasst? Dann trag dich über unser Anmeldeformular ein – dauert keine zwei Minuten.' },
@@ -88,6 +95,32 @@ const faqs = [
         :size="240"
         class="pointer-events-none absolute -bottom-2 right-2 block h-auto w-28 drop-shadow-2xl sm:right-4 sm:w-40 lg:w-60"
       />
+    </section>
+
+    <!-- Partner-Leiste -->
+    <section class="border-b border-border/60 bg-background">
+      <div class="mx-auto w-full max-w-6xl px-4 py-8">
+        <div class="flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Unterstützt von
+          </p>
+          <div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 sm:gap-x-10">
+            <img
+              v-for="s in sponsors"
+              :key="s.name"
+              :src="s.logo"
+              :alt="s.name"
+              class="h-9 w-auto object-contain opacity-70 grayscale transition hover:opacity-100 hover:grayscale-0 sm:h-10"
+            />
+          </div>
+          <NuxtLink
+            to="/sponsoring"
+            class="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-brand-sky-dark hover:underline"
+          >
+            Partner werden <ArrowRight class="size-4" />
+          </NuxtLink>
+        </div>
+      </div>
     </section>
 
     <!-- Der Platz -->

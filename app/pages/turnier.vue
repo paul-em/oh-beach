@@ -68,19 +68,6 @@ const highlights = [
               <a href="#infos">Alle Infos</a>
             </Button>
           </div>
-
-          <div class="pt-4">
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Präsentiert von unserem Hauptsponsor
-            </p>
-            <a href="https://www.silberholz.at/" target="_blank" rel="noopener" aria-label="Zur Website von SilberHolz">
-              <img
-                src="/Silberholz-logo.png"
-                alt="SilberHolz – Hauptsponsor"
-                class="h-12 w-auto transition-transform hover:scale-105 sm:h-14"
-              />
-            </a>
-          </div>
         </div>
       </div>
     </section>
@@ -168,7 +155,7 @@ const highlights = [
         <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Unser Hauptsponsor</p>
         <a href="https://www.silberholz.at/" target="_blank" rel="noopener" class="w-full max-w-2xl" aria-label="Zur Website von SilberHolz">
           <img
-            src="/Silberholz-logo.png"
+            src="/sponsoren/Silberholz-logo.png"
             alt="SilberHolz – Hauptsponsor der Beach Open"
             class="w-full shadow-md transition-transform hover:scale-[1.02]"
           />

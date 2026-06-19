@@ -72,10 +72,6 @@ export function maxDateStr(): string {
   return dt.toISOString().slice(0, 10)
 }
 
-function pad(n: number) {
-  return String(n).padStart(2, '0')
-}
-
 /** Erzeugt alle Slots eines Tages mit korrekten UTC-Zeitpunkten. */
 export function generateSlots(dateStr: string): Slot[] {
   const { y, mo, d } = ymd(dateStr)
@@ -85,7 +81,7 @@ export function generateSlots(dateStr: string): Slot[] {
     const end = localToUTC(y, mo, d, h + 1)
     slots.push({
       hour: h,
-      label: `${pad(h)}:00 – ${pad(h + 1)}:00`,
+      label: `${h} – ${h + 1} Uhr`,
       startISO: start.toISOString(),
       endISO: end.toISOString(),
     })

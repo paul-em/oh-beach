@@ -32,7 +32,7 @@ const label = computed(() => (props.weather ? LABELS[props.weather.kind] : ''))
     class="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/60 px-3 py-1 text-sm"
     :title="label"
   >
-    <BookingWeatherGlyph :kind="weather.kind" class="size-4 text-brand-sky" :aria-label="label" />
+    <BookingWeatherGlyph :kind="weather.kind" class="-my-2 size-8" :alt="label" />
     <span class="font-medium">{{ weather.tempMax }}°</span>
     <span class="text-muted-foreground">/ {{ weather.tempMin }}°</span>
     <span v-if="weather.windy" class="inline-flex items-center gap-1 text-muted-foreground" title="Windig">

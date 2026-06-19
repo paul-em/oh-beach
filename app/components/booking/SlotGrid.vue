@@ -184,22 +184,20 @@ onBeforeUnmount(reset)
           v-if="s.status === 'free' && interactive"
           type="button"
           :data-hour="s.hour"
-          :data-weather="s.weather?.kind"
           :data-selected="selectedSet.has(s.hour) || undefined"
-          class="group relative h-20 overflow-hidden rounded-xl border-2 border-brand-sky/40 text-left transition-colors hover:border-brand-sky data-selected:border-brand-coral data-selected:ring-2 data-selected:ring-brand-coral/40"
+          class="group relative h-20 overflow-hidden rounded-xl border-2 border-brand-sky/40 bg-brand-sky/5 text-left transition-colors hover:border-brand-sky hover:bg-brand-sky/10 data-selected:border-brand-coral data-selected:bg-brand-coral/10 data-selected:ring-2 data-selected:ring-brand-coral/40"
           @pointerdown="onDown(s.hour, $event)"
           @keydown.enter.prevent="emit('book', [s.hour])"
           @keydown.space.prevent="emit('book', [s.hour])"
         >
-          <span class="weather-surface absolute inset-0 opacity-90 transition-opacity group-hover:opacity-100" />
-          <span v-if="selectedSet.has(s.hour)" class="absolute inset-0 bg-brand-coral/15" />
-          <BookingWeatherGlyph :kind="s.weather?.kind" :stroke-width="1.25" class="pointer-events-none absolute -bottom-4 -right-3 size-24 text-foreground/15" />
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
-            <span class="flex w-full items-start justify-between gap-2">
-              <span class="slot-legible min-w-0 truncate font-display font-semibold">{{ s.label }}</span>
-              <span v-if="s.weather" class="temp-badge slot-legible shrink-0 text-xs font-semibold tabular-nums">{{ s.weather.temp }}°</span>
+            <span class="flex w-full items-center justify-between gap-2">
+              <span class="min-w-0 truncate font-display font-semibold">{{ s.label }}</span>
+              <span v-if="s.weather" class="inline-flex shrink-0 items-center gap-1 text-xs font-semibold tabular-nums">
+                <BookingWeatherGlyph :kind="s.weather.kind" class="-my-2 size-9" />{{ s.weather.temp }}°
+              </span>
             </span>
-            <span class="slot-legible text-sm font-semibold">{{ selectedSet.has(s.hour) ? 'Ausgewählt' : 'Frei · buchen' }}</span>
+            <span class="text-sm font-semibold">{{ selectedSet.has(s.hour) ? 'Ausgewählt' : 'Frei · buchen' }}</span>
           </span>
         </button>
 
@@ -207,17 +205,16 @@ onBeforeUnmount(reset)
         <div
           v-else-if="s.status === 'free'"
           :data-hour="s.hour"
-          :data-weather="s.weather?.kind"
-          class="relative h-20 overflow-hidden rounded-xl border border-border/70"
+          class="relative h-20 overflow-hidden rounded-xl border border-border/70 bg-muted/30"
         >
-          <span class="weather-surface absolute inset-0 opacity-80" />
-          <BookingWeatherGlyph :kind="s.weather?.kind" :stroke-width="1.25" class="pointer-events-none absolute -bottom-4 -right-3 size-24 text-foreground/15" />
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
-            <span class="flex w-full items-start justify-between gap-2">
-              <span class="slot-legible min-w-0 truncate font-display font-semibold">{{ s.label }}</span>
-              <span v-if="s.weather" class="temp-badge slot-legible shrink-0 text-xs font-semibold tabular-nums">{{ s.weather.temp }}°</span>
+            <span class="flex w-full items-center justify-between gap-2">
+              <span class="min-w-0 truncate font-display font-semibold">{{ s.label }}</span>
+              <span v-if="s.weather" class="inline-flex shrink-0 items-center gap-1 text-xs font-semibold tabular-nums">
+                <BookingWeatherGlyph :kind="s.weather.kind" class="-my-2 size-9" />{{ s.weather.temp }}°
+              </span>
             </span>
-            <span class="slot-legible text-sm font-semibold">Frei</span>
+            <span class="text-sm font-semibold">Frei</span>
           </span>
         </div>
 
@@ -225,12 +222,8 @@ onBeforeUnmount(reset)
         <div
           v-else-if="s.status === 'busy' && s.mine"
           :data-hour="s.hour"
-          :data-weather="s.weather?.kind"
-          class="relative h-20 overflow-hidden rounded-xl border-2 border-brand-coral"
+          class="relative h-20 overflow-hidden rounded-xl border-2 border-brand-coral bg-brand-coral/15"
         >
-          <span class="weather-surface absolute inset-0 opacity-40" />
-          <span class="absolute inset-0 bg-brand-coral/25" />
-          <BookingWeatherGlyph :kind="s.weather?.kind" :stroke-width="1.25" class="pointer-events-none absolute -bottom-4 -right-3 size-24 text-foreground/15" />
           <Button
             v-if="interactive && s.bookingId"
             variant="ghost"
@@ -243,12 +236,14 @@ onBeforeUnmount(reset)
             <X class="size-4" />
           </Button>
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
-            <span class="flex w-full items-start justify-between gap-2">
-              <span class="slot-legible min-w-0 truncate font-display font-semibold">{{ s.label }}</span>
-              <span v-if="s.weather" class="temp-badge slot-legible shrink-0 text-xs font-semibold tabular-nums">{{ s.weather.temp }}°</span>
+            <span class="flex w-full items-center justify-between gap-2">
+              <span class="min-w-0 truncate font-display font-semibold">{{ s.label }}</span>
+              <span v-if="s.weather" class="inline-flex shrink-0 items-center gap-1 text-xs font-semibold tabular-nums">
+                <BookingWeatherGlyph :kind="s.weather.kind" class="-my-2 size-9" />{{ s.weather.temp }}°
+              </span>
             </span>
             <span class="flex w-full min-w-0 flex-col pr-9">
-              <span class="slot-legible truncate text-sm font-semibold text-brand-coral-dark">Deine Buchung</span>
+              <span class="truncate text-sm font-semibold text-brand-coral-dark">Deine Buchung</span>
               <span v-if="s.note" class="truncate text-xs text-brand-coral-dark/80" :title="s.note">{{ s.note }}</span>
             </span>
           </span>
@@ -258,20 +253,18 @@ onBeforeUnmount(reset)
         <div
           v-else-if="s.status === 'busy'"
           :data-hour="s.hour"
-          :data-weather="s.weather?.kind"
-          class="relative h-20 overflow-hidden rounded-xl border border-border"
+          class="relative h-20 overflow-hidden rounded-xl border border-border bg-muted/50"
         >
-          <span class="weather-surface absolute inset-0 opacity-30" />
-          <span class="absolute inset-0 bg-background/55" />
           <span class="slot-hatch absolute inset-0" />
-          <BookingWeatherGlyph :kind="s.weather?.kind" :stroke-width="1.25" class="pointer-events-none absolute -bottom-4 -right-3 size-24 text-foreground/15" />
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
-            <span class="flex w-full items-start justify-between gap-2">
-              <span class="slot-legible min-w-0 truncate font-display font-semibold">{{ s.label }}</span>
-              <span v-if="s.weather" class="temp-badge slot-legible shrink-0 text-xs font-semibold tabular-nums">{{ s.weather.temp }}°</span>
+            <span class="flex w-full items-center justify-between gap-2">
+              <span class="min-w-0 truncate font-display font-semibold">{{ s.label }}</span>
+              <span v-if="s.weather" class="inline-flex shrink-0 items-center gap-1 text-xs font-semibold tabular-nums opacity-80">
+                <BookingWeatherGlyph :kind="s.weather.kind" class="-my-2 size-9" />{{ s.weather.temp }}°
+              </span>
             </span>
             <span class="w-full min-w-0">
-              <span class="slot-legible block truncate text-sm font-semibold" :title="s.bookedBy || 'Belegt'">{{ s.bookedBy || 'Belegt' }}</span>
+              <span class="block truncate text-sm font-semibold" :title="s.bookedBy || 'Belegt'">{{ s.bookedBy || 'Belegt' }}</span>
               <span v-if="s.note" class="block truncate text-xs opacity-80" :title="s.note">{{ s.note }}</span>
             </span>
           </span>
@@ -281,11 +274,8 @@ onBeforeUnmount(reset)
         <div
           v-else
           :data-hour="s.hour"
-          :data-weather="s.weather?.kind"
           class="relative h-20 overflow-hidden rounded-xl border border-dashed border-border/60 opacity-50"
         >
-          <span class="weather-surface absolute inset-0 opacity-25" />
-          <BookingWeatherGlyph :kind="s.weather?.kind" :stroke-width="1.25" class="pointer-events-none absolute -bottom-4 -right-3 size-24 text-foreground/15" />
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
             <span class="w-full truncate font-display font-semibold">{{ s.label }}</span>
             <span class="text-sm">Vorbei</span>

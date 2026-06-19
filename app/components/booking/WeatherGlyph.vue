@@ -1,28 +1,17 @@
 <script setup lang="ts">
 /**
- * Wetter-Icon für eine Wetter-Art – zentrale Zuordnung (von WeatherBadge und als
- * dezentes Hintergrund-Wasserzeichen in den Slots genutzt). Klasse/Attribute
- * werden an das gerenderte SVG durchgereicht (Größe, Farbe, stroke-width …).
+ * Wetter-Icon für eine Wetter-Art – animiertes SVG aus dem Set
+ * „Makin-Things/weather-icons". Die Dateien liegen unter
+ * /public/weather-icons/<kind>.svg und werden per <img> eingebunden, damit die
+ * SVG-internen CSS-Animationen laufen. Größe per Klasse (z. B. size-6) steuern.
  */
-import { Sun, CloudSun, Cloudy, CloudFog, CloudRain, CloudSnow, CloudLightning } from '@lucide/vue'
-
 type WeatherKind = 'clear' | 'partly' | 'cloudy' | 'fog' | 'rain' | 'snow' | 'storm'
 
-const props = defineProps<{ kind?: WeatherKind | null }>()
+const props = defineProps<{ kind?: WeatherKind | null; alt?: string }>()
 
-const ICONS: Record<WeatherKind, any> = {
-  clear: Sun,
-  partly: CloudSun,
-  cloudy: Cloudy,
-  fog: CloudFog,
-  rain: CloudRain,
-  snow: CloudSnow,
-  storm: CloudLightning,
-}
-
-const icon = computed(() => (props.kind ? ICONS[props.kind] : null))
+const src = computed(() => (props.kind ? `/weather-icons/${props.kind}.svg` : null))
 </script>
 
 <template>
-  <component :is="icon" v-if="icon" />
+  <img v-if="src" :src="src" :alt="alt || ''" draggable="false" class="select-none object-contain" />
 </template>

@@ -175,66 +175,6 @@
   opacity: 1;
 }
 
-/* === Wetter-Themes für den Buchungskalender ===
-   Pro Wetter-Art ein Verlaufspaar (--w-from/--w-to) und eine Akzentfarbe
-   (--w-accent). Werden auf Elementen mit [data-weather="…"] gesetzt und von
-   .weather-tint (sanfte Karten-Tönung) bzw. .weather-surface (Slot-Verlauf)
-   genutzt. Light- und Dark-Mode getrennt, damit beide Themes stimmig bleiben. */
-[data-weather] {
-  --w-from: var(--card);
-  --w-to: var(--card);
-  --w-accent: var(--card);
-}
-[data-weather="clear"]  { --w-from: #bfe6fb; --w-to: #ffe7a3; --w-accent: #5cc0f0; }
-[data-weather="partly"] { --w-from: #cfeafb; --w-to: #eef1f4; --w-accent: #7fc4e8; }
-[data-weather="cloudy"] { --w-from: #dbe4ec; --w-to: #c0ccd9; --w-accent: #a9b8c7; }
-[data-weather="fog"]    { --w-from: #e4e8eb; --w-to: #ced4d9; --w-accent: #bcc4ca; }
-[data-weather="rain"]   { --w-from: #bccddd; --w-to: #8ea6bd; --w-accent: #7e97b0; }
-[data-weather="snow"]   { --w-from: #f1f6fb; --w-to: #d9e5f0; --w-accent: #cadcec; }
-[data-weather="storm"]  { --w-from: #b3bfce; --w-to: #6c7c8f; --w-accent: #6f7f93; }
-
-.dark [data-weather="clear"]  { --w-from: #14506b; --w-to: #3e3c24; --w-accent: #1f6f93; }
-.dark [data-weather="partly"] { --w-from: #154250; --w-to: #1d2f37; --w-accent: #1d6585; }
-.dark [data-weather="cloudy"] { --w-from: #253a45; --w-to: #1a2a31; --w-accent: #34505d; }
-.dark [data-weather="fog"]    { --w-from: #2a363b; --w-to: #1c262a; --w-accent: #3a484e; }
-.dark [data-weather="rain"]   { --w-from: #1d333f; --w-to: #122029; --w-accent: #2b4757; }
-.dark [data-weather="snow"]   { --w-from: #2b3c45; --w-to: #1d2e35; --w-accent: #3a525f; }
-.dark [data-weather="storm"]  { --w-from: #1a2730; --w-to: #0c151b; --w-accent: #2a3b48; }
-
-/* Sanfte Tönung der ganzen Kalender-Karte: Wetter-Akzent in die Kartenfarbe
-   gemischt – kräftig genug zum Erkennen, dezent genug für lesbaren Inhalt. */
-.weather-tint {
-  background-color: color-mix(in srgb, var(--w-accent) 20%, var(--card));
-  transition: background-color 0.5s ease;
-}
-
-/* Dezenter Wetter-Verlauf hinter dem Slot-Inhalt – Wetterfarben zur Kartenfarbe
-   hin abgemischt, damit der Inhalt klar lesbar bleibt. */
-.weather-surface {
-  background-image: linear-gradient(
-    155deg,
-    color-mix(in srgb, var(--w-from) 22%, var(--card)),
-    color-mix(in srgb, var(--w-to) 22%, var(--card))
-  );
-}
-
-/* Lesbarkeits-Aura: weicher Halo in Kartenfarbe (hell im Light-, dunkel im
-   Dark-Mode), damit Uhrzeit/Grad auf dem Wetter-Verlauf klar lesbar bleiben. */
-.slot-legible {
-  text-shadow:
-    0 0 2px color-mix(in srgb, var(--card) 96%, transparent),
-    0 0 6px color-mix(in srgb, var(--card) 85%, transparent),
-    0 1px 1px color-mix(in srgb, var(--card) 96%, transparent);
-}
-
-/* Temperatur-Badge: leichter, runder Solid-Hintergrund in Kartenfarbe, damit der
-   Grad-Wert auf dem Wetter-Verlauf gut lesbar bleibt. */
-.temp-badge {
-  background-color: color-mix(in srgb, var(--card) 78%, transparent);
-  border-radius: 9999px;
-  padding: 0.0625rem 0.375rem;
-}
-
 /* Diagonale Schraffur für belegte Slots – signalisiert eindeutig „nicht frei". */
 .slot-hatch {
   background-image: repeating-linear-gradient(

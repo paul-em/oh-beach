@@ -15,20 +15,7 @@ useSeoMeta({
 const PDF_URL = '/Sponsormappe-OHBeach.pdf'
 const CONTACT_MAIL = 'info@oh-beach.at'
 
-/*
-  Partner-Logos liegen in public/sponsoren/.
-  `logo: null` rendert einen Platzhalter. SilberHolz ist unser Hauptpartner.
-*/
-const partners = [
-  { name: 'SilberHolz', logo: '/sponsoren/Silberholz-logo.png', url: 'https://www.silberholz.at/', featured: true },
-  { name: 'Raiffeisen Gunskirchen', logo: '/sponsoren/raiffeisen-gunskirchen.svg', url: null, featured: false },
-  { name: 'XXXLutz', logo: '/sponsoren/xxxlutz-2018.jpg', url: 'https://www.xxxlutz.at/', featured: false },
-  { name: 'Felbermair Keramikwelt', logo: '/sponsoren/Felbermair-Brand.svg', url: null, featured: false },
-  { name: 'Poschacher', logo: '/sponsoren/Poschacher.jpeg', url: 'https://www.instagram.com/spar.poschacher', featured: false },
-  { name: 'Reinthaler Bau', logo: '/sponsoren/reinthaler-logo-weiss.webp', url: null, featured: false },
-  { name: 'Ganic', logo: '/sponsoren/Vitaminwater-Logo-2016.png', url: 'https://www.vitaminwater.at/ganic-sport/', featured: false },
-  { name: 'VR Frag', logo: '/sponsoren/VRFragLogo.webp', url: null, featured: false },
-]
+// Partner-Liste zentral aus app/utils/partners.ts (auto-importiert)
 
 // Kurze Vereins-Kennzahlen aus der Mappe – machen Lust auf eine Partnerschaft
 const facts = [

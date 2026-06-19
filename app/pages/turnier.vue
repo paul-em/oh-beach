@@ -8,6 +8,10 @@ import {
 
 const REGISTER_URL = 'https://app.tournamize.com/tournaments/294'
 
+// Partner zentral aus app/utils/partners.ts (auto-importiert)
+const mainPartner = partners.find(p => p.featured)
+const otherPartners = partners.filter(p => !p.featured)
+
 useSeoMeta({
   title: 'SilberHolz Beach Open 2026',
   description:
@@ -150,26 +154,57 @@ const highlights = [
     </SiteSection>
 
     <!-- Hauptsponsor -->
-    <SiteSection>
+    <SiteSection v-if="mainPartner">
       <div class="flex flex-col items-center gap-6 text-center">
         <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Unser Hauptsponsor</p>
-        <a href="https://www.silberholz.at/" target="_blank" rel="noopener" class="w-full max-w-2xl" aria-label="Zur Website von SilberHolz">
+        <a :href="mainPartner.url || undefined" target="_blank" rel="noopener" class="w-full max-w-2xl" :aria-label="`Zur Website von ${mainPartner.name}`">
           <img
-            src="/sponsoren/Silberholz-logo.png"
-            alt="SilberHolz – Hauptsponsor der Beach Open"
+            :src="mainPartner.logo"
+            :alt="`${mainPartner.name} – Hauptsponsor der Beach Open`"
             class="w-full shadow-md transition-transform hover:scale-[1.02]"
           />
         </a>
         <p class="max-w-xl text-muted-foreground">
-          <span class="font-semibold text-foreground">SilberHolz</span> ist eine Tischlerei aus der
-          Region, die nachhaltig gefertigte Küchen und Möbel für Haus und Garten herstellt –
-          getreu dem Motto „Natürlich SilberHolz“. Danke, dass ihr unser Turnier möglich macht!
+          {{ mainPartner.description }} Danke, dass ihr unser Turnier möglich macht!
         </p>
-        <Button as-child variant="secondary">
-          <a href="https://www.silberholz.at/" target="_blank" rel="noopener">
-            Zur Website von SilberHolz <ExternalLink class="size-4" />
+        <Button v-if="mainPartner.url" as-child variant="secondary">
+          <a :href="mainPartner.url" target="_blank" rel="noopener">
+            Zur Website von {{ mainPartner.name }} <ExternalLink class="size-4" />
           </a>
         </Button>
+      </div>
+    </SiteSection>
+
+    <!-- Weitere Partner -->
+    <SiteSection tone="navy">
+      <div class="mb-10 max-w-2xl">
+        <h2 class="text-3xl">Unsere Partner</h2>
+        <p class="mt-3 text-white/80">
+          Ohne die Unterstützung dieser Unternehmen aus der Region wäre unser Turnier
+          nicht möglich. Schau vorbei – sie haben es sich verdient!
+        </p>
+      </div>
+      <div class="grid gap-6 md:grid-cols-2">
+        <div
+          v-for="p in otherPartners"
+          :key="p.name"
+          class="flex flex-col rounded-xl border border-white/15 bg-white/5 p-6"
+        >
+          <div class="flex h-16 items-center justify-center rounded-lg bg-white p-3">
+            <img :src="p.logo" :alt="p.name" class="max-h-full w-auto max-w-[70%] object-contain" />
+          </div>
+          <h3 class="mt-5 text-xl">{{ p.name }}</h3>
+          <p class="mt-2 flex-1 text-white/75">{{ p.description }}</p>
+          <a
+            v-if="p.url"
+            :href="p.url"
+            target="_blank"
+            rel="noopener"
+            class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-sky hover:underline"
+          >
+            Zur Website <ExternalLink class="size-4" />
+          </a>
+        </div>
       </div>
     </SiteSection>
 

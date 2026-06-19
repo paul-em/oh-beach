@@ -16,17 +16,7 @@ const trainings = [
   { day: 'Montag', time: '19:00 – 21:00', note: 'Beach Monday - Offenes Training für alle' },
 ]
 
-// Sponsoren-Logos für die Partner-Leiste (Details auf /sponsoring)
-const sponsors = [
-  { name: 'SilberHolz', logo: '/sponsoren/Silberholz-logo.png' },
-  { name: 'Raiffeisen Gunskirchen', logo: '/sponsoren/raiffeisen-gunskirchen.svg' },
-  { name: 'XXXLutz', logo: '/sponsoren/xxxlutz-2018.jpg' },
-  { name: 'Felbermair Keramikwelt', logo: '/sponsoren/Felbermair-Brand.svg' },
-  { name: 'Poschacher', logo: '/sponsoren/Poschacher.jpeg' },
-  { name: 'Reinthaler Bau', logo: '/sponsoren/reinthaler-logo-weiss.webp' },
-  { name: 'Ganic', logo: '/sponsoren/Vitaminwater-Logo-2016.png' },
-  { name: 'VR Frag', logo: '/sponsoren/VRFragLogo.webp' },
-]
+// Partner-Logos zentral aus app/utils/partners.ts (auto-importiert)
 
 const steps = [
   { n: 1, title: 'Vorbeikommen & kennenlernen', text: 'Schau am besten zuerst bei einem Trainingstermin vorbei. So lernen wir uns gegenseitig kennen und du bekommst ein Gefühl dafür, ob wir zusammenpassen.' },
@@ -111,7 +101,7 @@ const faqs = [
           </p>
           <div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 sm:gap-x-10">
             <img
-              v-for="s in sponsors"
+              v-for="s in partners"
               :key="s.name"
               :src="s.logo"
               :alt="s.name"

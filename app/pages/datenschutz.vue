@@ -51,6 +51,12 @@ useSeoMeta({ title: 'Datenschutzerklärung', description: 'Datenschutzerklärung
         <strong>Resend (resend.com):</strong> Versand von E-Mails zum Setzen bzw.
         Zurücksetzen des Passworts.
       </li>
+      <li>
+        <strong>Cloudflare, Inc.:</strong> DNS-Hosting für unsere Domain. Der
+        Proxy ist aktiviert, sodass der Datenverkehr über Cloudflare geleitet und
+        zwischengespeichert (Caching) wird. Dabei können technische Daten
+        (inkl. IP-Adresse) verarbeitet werden.
+      </li>
     </ul>
     <p>
       Mit diesen Anbietern bestehen Auftragsverarbeitungsverträge. Soweit Daten in

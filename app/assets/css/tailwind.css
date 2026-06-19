@@ -175,15 +175,6 @@
   opacity: 1;
 }
 
-/* Diagonale Schraffur für belegte Slots – signalisiert eindeutig „nicht frei". */
-.slot-hatch {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    color-mix(in srgb, var(--foreground) 12%, transparent) 0 5px,
-    transparent 5px 12px
-  );
-}
-
 /* Fließtext-Styling für Rechtsseiten (Statuten/Impressum/Datenschutz) */
 .prose-legal {
   color: var(--foreground);

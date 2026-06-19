@@ -255,7 +255,6 @@ onBeforeUnmount(reset)
           :data-hour="s.hour"
           class="relative h-20 overflow-hidden rounded-xl border border-border bg-muted/50"
         >
-          <span class="slot-hatch absolute inset-0" />
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
             <span class="flex w-full items-center justify-between gap-2">
               <span class="min-w-0 truncate font-display font-semibold">{{ s.label }}</span>

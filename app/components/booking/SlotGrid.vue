@@ -205,7 +205,7 @@ onBeforeUnmount(reset)
         <div
           v-else-if="s.status === 'free'"
           :data-hour="s.hour"
-          class="relative h-20 overflow-hidden rounded-xl border border-border/70 bg-muted/30"
+          class="relative h-20 overflow-hidden rounded-xl border-2 border-brand-sky/50 bg-brand-sky/10"
         >
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
             <span class="flex w-full items-center justify-between gap-2">
@@ -214,7 +214,7 @@ onBeforeUnmount(reset)
                 <BookingWeatherGlyph :kind="s.weather.kind" class="-my-2 size-9" />{{ s.weather.temp }}°
               </span>
             </span>
-            <span class="text-sm font-semibold">Frei</span>
+            <span class="text-sm font-semibold text-brand-sky-dark">Frei</span>
           </span>
         </div>
 
@@ -253,12 +253,12 @@ onBeforeUnmount(reset)
         <div
           v-else-if="s.status === 'busy'"
           :data-hour="s.hour"
-          class="relative h-20 overflow-hidden rounded-xl border border-border bg-muted/50"
+          class="relative h-20 overflow-hidden rounded-xl border border-border bg-muted text-muted-foreground"
         >
           <span class="relative z-10 flex h-full flex-col items-start justify-between p-3">
             <span class="flex w-full items-center justify-between gap-2">
               <span class="min-w-0 truncate font-display font-semibold">{{ s.label }}</span>
-              <span v-if="s.weather" class="inline-flex shrink-0 items-center gap-1 text-xs font-semibold tabular-nums opacity-80">
+              <span v-if="s.weather" class="inline-flex shrink-0 items-center gap-1 text-xs font-semibold tabular-nums opacity-70">
                 <BookingWeatherGlyph :kind="s.weather.kind" class="-my-2 size-9" />{{ s.weather.temp }}°
               </span>
             </span>

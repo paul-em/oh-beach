@@ -27,6 +27,16 @@ export default defineNuxtConfig({
   // Server-seitige Secrets. Werte kommen aus NUXT_*-Umgebungsvariablen.
   // (Nuxt mappt z. B. NUXT_GOOGLE_SHEET_ID -> runtimeConfig.googleSheetId)
   runtimeConfig: {
+    // Session-Cookie (nuxt-auth-utils / h3). Passwort kommt aus NUXT_SESSION_PASSWORD.
+    // maxAge = absolutes Limit des Cookies; das Sliding-Window wird zusätzlich von
+    // server/middleware/session-refresh.ts nachgezogen (createdAt neu setzen).
+    session: {
+      name: 'nuxt-session',
+      maxAge: 60 * 60 * 24 * 30, // 30 Tage
+      cookie: {
+        sameSite: 'lax',
+      },
+    },
     authTokenSecret: '',
     googleServiceAccountEmail: '',
     googlePrivateKey: '',

@@ -55,7 +55,7 @@ export const partners: Partner[] = [
     logo: '/sponsoren/Poschacher.png',
     url: 'https://www.instagram.com/spar.poschacher',
     description:
-      'Die SPAR-Märkte Poschacher in Offenhausen und Gunskirchen sind die freundlichen Nahversorger ums Eck und versorgen die Region mit frischen Lebensmitteln und allem für den täglichen Bedarf.',
+      'Der SPAR-Markt Poschacher in Gunskirchen ist der freundliche Nahversorger ums Eck und versorgt die Region mit frischen Lebensmitteln und allem für den täglichen Bedarf.',
   },
   {
     name: 'Reinthaler Bau',

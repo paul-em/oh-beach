@@ -119,7 +119,7 @@ const semanticColors = [
         <CardContent class="space-y-4">
           <div class="space-y-2">
             <Label for="sg-email">E-Mail</Label>
-            <Input id="sg-email" type="email" placeholder="name@verein.at" />
+            <Input id="sg-email" type="email" placeholder="deine@email.com" />
           </div>
           <div class="space-y-2">
             <Label for="sg-pw">Passwort</Label>

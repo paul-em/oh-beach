@@ -60,7 +60,7 @@ async function onSubmit() {
         <form v-else class="space-y-4" @submit.prevent="onSubmit">
           <div class="space-y-2">
             <Label for="email">E-Mail</Label>
-            <Input id="email" v-model="email" type="email" autocomplete="email" required placeholder="name@verein.at" />
+            <Input id="email" v-model="email" type="email" autocomplete="email" required placeholder="deine@email.com" />
           </div>
           <Button type="submit" class="w-full" :disabled="loading">
             {{ loading ? 'Link senden …' : 'Anmelde-Link senden' }}

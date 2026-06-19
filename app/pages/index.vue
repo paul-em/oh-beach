@@ -19,8 +19,13 @@ const trainings = [
 // Sponsoren-Logos für die Partner-Leiste (Details auf /sponsoring)
 const sponsors = [
   { name: 'SilberHolz', logo: '/sponsoren/Silberholz-logo.png' },
+  { name: 'Raiffeisen Gunskirchen', logo: '/sponsoren/raiffeisen-gunskirchen.svg' },
+  { name: 'XXXLutz', logo: '/sponsoren/xxxlutz-2018.jpg' },
+  { name: 'Felbermair Keramikwelt', logo: '/sponsoren/Felbermair-Brand.svg' },
   { name: 'Poschacher', logo: '/sponsoren/Poschacher.jpeg' },
-  { name: 'Vitaminwater', logo: '/sponsoren/Vitaminwater-Logo-2016.png' },
+  { name: 'Reinthaler Bau', logo: '/sponsoren/reinthaler-logo-weiss.webp' },
+  { name: 'Ganic', logo: '/sponsoren/Vitaminwater-Logo-2016.png' },
+  { name: 'VR Frag', logo: '/sponsoren/VRFragLogo.webp' },
 ]
 
 const steps = [

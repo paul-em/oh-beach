@@ -14,6 +14,7 @@ useSeoMeta({ title: 'Platz reservieren' })
 const date = useDateParam()
 const { data, pending, refresh } = await useFetch('/api/bookings', {
   query: { date },
+  lazy: true,
   default: () => null,
 })
 

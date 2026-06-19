@@ -19,6 +19,7 @@ const date = useDateParam()
 
 const { data, pending } = await useFetch('/api/bookings', {
   query: { date },
+  lazy: true,
   default: () => null,
 })
 </script>

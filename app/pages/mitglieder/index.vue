@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { CalendarPlus, CalendarDays, ListChecks, Dices, UserCog } from '@lucide/vue'
+import { CalendarPlus, CalendarDays, ListChecks, Dices, UserCog, Gamepad2 } from '@lucide/vue'
 
 definePageMeta({ middleware: 'auth' })
 useSeoMeta({ title: 'Mein Bereich' })
@@ -65,6 +65,19 @@ const { user } = useUserSession()
         </CardHeader>
         <CardContent>
           <Button as-child variant="secondary" class="w-full"><NuxtLink to="/mitglieder/auslosen">Auslosung starten</NuxtLink></Button>
+        </CardContent>
+      </Card>
+
+      <Card class="sm:col-span-2">
+        <CardHeader>
+          <div class="mb-2 flex size-12 items-center justify-center rounded-xl bg-brand-sky/15 text-brand-sky-dark">
+            <Gamepad2 class="size-6" />
+          </div>
+          <CardTitle>Beach-Blobby</CardTitle>
+          <CardDescription>Kleines 2-Spieler-Match für die Wartezeit – an einem Gerät gegeneinander.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button as-child variant="secondary" class="w-full"><NuxtLink to="/mitglieder/spiel">Spielen</NuxtLink></Button>
         </CardContent>
       </Card>
     </div>

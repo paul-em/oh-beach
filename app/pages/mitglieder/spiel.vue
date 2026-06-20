@@ -48,12 +48,32 @@ watchEffect(() => {
 
 // ---- Eingaben (bewusst NICHT reaktiv – wird pro Frame gelesen) -------------
 type Ctrl = 'left' | 'right' | 'jump'
+type Player = 'p1' | 'p2'
 const input = {
   p1: { left: false, right: false, jump: false },
   p2: { left: false, right: false, jump: false },
 }
-function press(player: 'p1' | 'p2', ctrl: Ctrl, val: boolean) {
-  input[player][ctrl] = val
+
+// D-Pad (mobil): Richtung ergibt sich aus der Daumenposition relativ zur Mitte.
+// Erlaubt Diagonalen (z. B. oben-links = springen + nach links).
+function padEval(player: Player, e: PointerEvent) {
+  const el = e.currentTarget as HTMLElement
+  const rect = el.getBoundingClientRect()
+  const dx = e.clientX - (rect.left + rect.width / 2)
+  const dy = e.clientY - (rect.top + rect.height / 2)
+  const th = rect.width * 0.16 // Totzone um die Mitte
+  const inp = input[player]
+  inp.left = dx < -th
+  inp.right = dx > th
+  inp.jump = dy < -th
+}
+function padStart(player: Player, e: PointerEvent) {
+  ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+  padEval(player, e)
+}
+function padEnd(player: Player) {
+  const inp = input[player]
+  inp.left = inp.right = inp.jump = false
 }
 
 // ---- Spielobjekte (plain, performance) -------------------------------------
@@ -419,51 +439,30 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <!-- Touch-Steuerung -->
-    <div class="mt-4 flex items-end justify-between gap-4 sm:hidden">
-      <div class="flex flex-col items-center gap-1">
-        <button
-          class="flex size-14 items-center justify-center rounded-full bg-brand-coral text-white shadow active:scale-95"
+    <!-- Touch-Steuerung: D-Pad je Spieler (Diagonale = springen + laufen) -->
+    <div class="mt-4 flex items-start justify-between gap-4 sm:hidden">
+      <div
+        v-for="pad in ([
+          { player: 'p1', label: name1 || 'Spieler 1', color: 'text-brand-coral' },
+          { player: 'p2', label: name2 || 'Spieler 2', color: 'text-brand-navy' },
+        ] as const)"
+        :key="pad.player"
+        class="flex flex-col items-center gap-1.5"
+      >
+        <span class="text-xs font-medium text-muted-foreground">{{ pad.label }}</span>
+        <div
+          class="relative grid size-36 grid-cols-3 grid-rows-3 rounded-2xl border border-border bg-muted/70 shadow-inner select-none"
           style="touch-action: none"
-          @pointerdown.prevent="press('p1', 'jump', true)" @pointerup="press('p1', 'jump', false)"
-          @pointerleave="press('p1', 'jump', false)" @pointercancel="press('p1', 'jump', false)"
-        ><ChevronUp class="size-7" /></button>
-        <div class="flex gap-1">
-          <button
-            class="flex size-14 items-center justify-center rounded-full bg-brand-coral text-white shadow active:scale-95"
-            style="touch-action: none"
-            @pointerdown.prevent="press('p1', 'left', true)" @pointerup="press('p1', 'left', false)"
-            @pointerleave="press('p1', 'left', false)" @pointercancel="press('p1', 'left', false)"
-          ><ChevronLeft class="size-7" /></button>
-          <button
-            class="flex size-14 items-center justify-center rounded-full bg-brand-coral text-white shadow active:scale-95"
-            style="touch-action: none"
-            @pointerdown.prevent="press('p1', 'right', true)" @pointerup="press('p1', 'right', false)"
-            @pointerleave="press('p1', 'right', false)" @pointercancel="press('p1', 'right', false)"
-          ><ChevronRight class="size-7" /></button>
-        </div>
-      </div>
-
-      <div class="flex flex-col items-center gap-1">
-        <button
-          class="flex size-14 items-center justify-center rounded-full bg-brand-navy text-white shadow active:scale-95"
-          style="touch-action: none"
-          @pointerdown.prevent="press('p2', 'jump', true)" @pointerup="press('p2', 'jump', false)"
-          @pointerleave="press('p2', 'jump', false)" @pointercancel="press('p2', 'jump', false)"
-        ><ChevronUp class="size-7" /></button>
-        <div class="flex gap-1">
-          <button
-            class="flex size-14 items-center justify-center rounded-full bg-brand-navy text-white shadow active:scale-95"
-            style="touch-action: none"
-            @pointerdown.prevent="press('p2', 'left', true)" @pointerup="press('p2', 'left', false)"
-            @pointerleave="press('p2', 'left', false)" @pointercancel="press('p2', 'left', false)"
-          ><ChevronLeft class="size-7" /></button>
-          <button
-            class="flex size-14 items-center justify-center rounded-full bg-brand-navy text-white shadow active:scale-95"
-            style="touch-action: none"
-            @pointerdown.prevent="press('p2', 'right', true)" @pointerup="press('p2', 'right', false)"
-            @pointerleave="press('p2', 'right', false)" @pointercancel="press('p2', 'right', false)"
-          ><ChevronRight class="size-7" /></button>
+          @pointerdown.prevent="padStart(pad.player, $event)"
+          @pointermove.prevent="padEval(pad.player, $event)"
+          @pointerup="padEnd(pad.player)"
+          @pointercancel="padEnd(pad.player)"
+          @lostpointercapture="padEnd(pad.player)"
+        >
+          <ChevronUp :class="['pointer-events-none col-start-2 row-start-1 size-8 self-center justify-self-center', pad.color]" />
+          <ChevronLeft :class="['pointer-events-none col-start-1 row-start-2 size-8 self-center justify-self-center', pad.color]" />
+          <span class="pointer-events-none col-start-2 row-start-2 size-3 self-center justify-self-center rounded-full bg-border" />
+          <ChevronRight :class="['pointer-events-none col-start-3 row-start-2 size-8 self-center justify-self-center', pad.color]" />
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { CalendarPlus, CalendarDays, ListChecks } from '@lucide/vue'
+import { CalendarPlus, CalendarDays, ListChecks, Dices, UserCog } from '@lucide/vue'
 
 definePageMeta({ middleware: 'auth' })
 useSeoMeta({ title: 'Mein Bereich' })
@@ -54,7 +54,38 @@ const { user } = useUserSession()
           <Button as-child variant="secondary" class="w-full"><NuxtLink to="/mitglieder/meine-buchungen">Anzeigen</NuxtLink></Button>
         </CardContent>
       </Card>
+
+      <Card class="sm:col-span-2">
+        <CardHeader>
+          <div class="mb-2 flex size-12 items-center justify-center rounded-xl bg-brand-coral/15 text-brand-coral">
+            <Dices class="size-6" />
+          </div>
+          <CardTitle>Teams auslosen</CardTitle>
+          <CardDescription>Anwesende und Gäste wählen und faire Teams ziehen.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button as-child variant="secondary" class="w-full"><NuxtLink to="/mitglieder/auslosen">Auslosung starten</NuxtLink></Button>
+        </CardContent>
+      </Card>
     </div>
+
+    <section class="mt-10">
+      <h2 class="mb-4 text-xl">Einstellungen</h2>
+      <Card>
+        <CardContent class="flex flex-col gap-4 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex items-center gap-3">
+            <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              <UserCog class="size-5" />
+            </div>
+            <div>
+              <p class="font-semibold">Mein Profil</p>
+              <p class="text-sm text-muted-foreground">Persönliche Daten, Kontakt und Spielstärke bearbeiten.</p>
+            </div>
+          </div>
+          <Button as-child variant="outline"><NuxtLink to="/mitglieder/profil">Profil bearbeiten</NuxtLink></Button>
+        </CardContent>
+      </Card>
+    </section>
 
     <div class="mt-6">
       <Button as-child variant="ghost">

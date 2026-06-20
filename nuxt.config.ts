@@ -49,7 +49,7 @@ export default defineNuxtConfig({
     public: {
       siteUrl: 'http://localhost:3000',
       // URL des bestehenden Google-Formulars für neue Mitglieder
-      joinFormUrl: 'https://docs.google.com/spreadsheets/d/1joL6gx3NSJeF7VvlSUm2j-re7mJB0-FvKDTmazSvlH0/edit?gid=1784728470#gid=1784728470',
+      joinFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSeUxdkeZV4mdNCbM23P2rHGQp54I6eMzgIrh9TG_DKIwGzuNw/viewform?usp=dialog',
     },
   },
 

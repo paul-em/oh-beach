@@ -42,6 +42,16 @@ const serving = ref(false)
 const name1 = ref('')
 const name2 = ref('')
 
+// ---- Mobile: Vollbild im Querformat ---------------------------------------
+// Am Handy macht das Spiel nur quer & im Vollbild Sinn (zwei D-Pads
+// nebeneinander, breites Spielfeld). Wir wechseln darum beim Start in einen
+// immersiven Layout-Modus, versuchen echtes Vollbild + Orientierungs-Lock und
+// blenden ansonsten einen "bitte drehen"-Hinweis ein.
+const isTouch = ref(false)
+const isPortrait = ref(false)
+const gameRoot = ref<HTMLElement | null>(null)
+const immersive = computed(() => isTouch.value && started.value)
+
 watchEffect(() => {
   if (!name1.value) name1.value = (user.value?.name || 'Spieler 1').split(' ')[0] || 'Spieler 1'
 })
@@ -123,7 +133,34 @@ function resetServe(serverSide: 1 | 2) {
 function startMatch() {
   score1.value = 0; score2.value = 0; winner.value = 0
   started.value = true
+  if (isTouch.value) enterImmersive()
   resetServe(Math.random() < 0.5 ? 1 : 2)
+}
+
+// Echtes Vollbild + Querformat-Lock (best effort – iOS unterstützt beides
+// nicht, dort sorgt das CSS-Vollbild + der Dreh-Hinweis für ein brauchbares
+// Erlebnis). Muss aus einer User-Geste heraus aufgerufen werden.
+async function enterImmersive() {
+  const el = gameRoot.value
+  try {
+    if (el && !document.fullscreenElement && el.requestFullscreen) await el.requestFullscreen()
+  } catch { /* vom Browser/Gerät nicht erlaubt */ }
+  try {
+    const orientation = screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }
+    await orientation?.lock?.('landscape')
+  } catch { /* Lock nicht unterstützt (z. B. iOS) */ }
+}
+
+function exitImmersive() {
+  try { (screen.orientation as ScreenOrientation & { unlock?: () => void })?.unlock?.() } catch { /* egal */ }
+  if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {})
+}
+
+// Spiel verlassen (Button im Vollbild) -> zurück zum Start-Overlay.
+function leaveGame() {
+  exitImmersive()
+  started.value = false
+  winner.value = 0
 }
 
 function awardPoint(scorer: 1 | 2) {
@@ -364,9 +401,15 @@ function loadSprites() {
   ballImg.src = '/volleyball.png'
 }
 
+const portraitMq = import.meta.client ? window.matchMedia('(orientation: portrait)') : null
+function updateOrientation() { if (portraitMq) isPortrait.value = portraitMq.matches }
+
 onMounted(() => {
   setupCanvas()
   loadSprites()
+  isTouch.value = window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window
+  updateOrientation()
+  portraitMq?.addEventListener('change', updateOrientation)
   window.addEventListener('keydown', keydown)
   window.addEventListener('keyup', keyup)
   raf = requestAnimationFrame(frame)
@@ -374,14 +417,21 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   cancelAnimationFrame(raf)
+  exitImmersive()
+  portraitMq?.removeEventListener('change', updateOrientation)
   window.removeEventListener('keydown', keydown)
   window.removeEventListener('keyup', keyup)
 })
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-4xl px-4 py-8">
-    <header class="mb-5 flex items-center justify-between gap-4">
+  <div
+    ref="gameRoot"
+    :class="immersive
+      ? 'fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-brand-navy'
+      : 'mx-auto w-full max-w-4xl px-4 py-8'"
+  >
+    <header v-if="!immersive" class="mb-5 flex items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-coral/15 text-brand-coral">
           <Gamepad2 class="size-6" />
@@ -394,16 +444,35 @@ onBeforeUnmount(() => {
       <Button as-child variant="ghost" size="sm" class="hidden sm:inline-flex"><NuxtLink to="/mitglieder">Zurück</NuxtLink></Button>
     </header>
 
-    <!-- Scoreboard -->
-    <div class="mb-3 flex items-center justify-center gap-4 font-display text-lg">
+    <!-- Scoreboard (im Vollbild als Overlay oben) -->
+    <div
+      :class="immersive
+        ? 'pointer-events-none absolute inset-x-0 top-2 z-20 flex items-center justify-center gap-3 font-display text-base text-white drop-shadow'
+        : 'mb-3 flex items-center justify-center gap-4 font-display text-lg'"
+    >
       <span class="flex items-center gap-2"><span class="size-3 rounded-full bg-brand-coral" /> {{ name1 || 'Spieler 1' }}</span>
       <span class="rounded-md bg-brand-navy px-3 py-1 font-bold text-white tabular-nums">{{ score1 }} : {{ score2 }}</span>
       <span class="flex items-center gap-2">{{ name2 || 'Spieler 2' }} <span class="size-3 rounded-full bg-brand-navy" /></span>
     </div>
 
+    <!-- Vollbild verlassen -->
+    <button
+      v-if="immersive"
+      type="button"
+      class="absolute right-3 top-2 z-20 rounded-full bg-white/85 px-3 py-1 text-sm font-semibold text-brand-navy shadow"
+      @click="leaveGame"
+    >Beenden</button>
+
     <!-- Spielfeld -->
-    <div class="relative overflow-hidden rounded-xl border border-border shadow-sm">
-      <canvas ref="canvasRef" class="block w-full select-none" style="touch-action: none; aspect-ratio: 800 / 400" />
+    <div
+      :class="immersive ? 'relative max-h-full max-w-full' : 'relative overflow-hidden rounded-xl border border-border shadow-sm'"
+      :style="immersive ? 'aspect-ratio: 800 / 400; width: min(100vw, 200dvh)' : ''"
+    >
+      <canvas
+        ref="canvasRef"
+        :class="immersive ? 'block h-full w-full select-none' : 'block w-full select-none'"
+        style="touch-action: none; aspect-ratio: 800 / 400"
+      />
 
       <!-- Start-Overlay -->
       <div v-if="!started" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-brand-navy/70 px-6 text-center text-white backdrop-blur-sm">
@@ -421,7 +490,7 @@ onBeforeUnmount(() => {
         <Button size="lg" class="mt-1" @click="startMatch">Spiel starten</Button>
         <p class="max-w-md text-xs text-white/70">
           Tastatur: Spieler 1 = A / D bewegen, W springen · Spieler 2 = ◀ / ▶ bewegen, ▲ springen.
-          Am Handy: die Tasten unten (jeder steuert seine Seite).
+          Am Handy startet das Spiel quer im Vollbild – die D-Pads in den unteren Ecken steuern je eine Seite.
         </p>
       </div>
 
@@ -439,19 +508,25 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <!-- Touch-Steuerung: D-Pad je Spieler (Diagonale = springen + laufen) -->
-    <div class="mt-4 flex items-start justify-between gap-4 sm:hidden">
+    <!-- Touch-Steuerung: D-Pad je Spieler (Diagonale = springen + laufen).
+         Im Vollbild als Overlay in den unteren Ecken, sonst unter dem Feld. -->
+    <div
+      :class="immersive
+        ? 'pointer-events-none fixed inset-x-0 bottom-3 z-20 flex items-end justify-between px-4'
+        : 'mt-4 flex items-start justify-between gap-4 sm:hidden'"
+    >
       <div
         v-for="pad in ([
           { player: 'p1', label: name1 || 'Spieler 1', color: 'text-brand-coral' },
           { player: 'p2', label: name2 || 'Spieler 2', color: 'text-brand-navy' },
         ] as const)"
         :key="pad.player"
-        class="flex flex-col items-center gap-1.5"
+        :class="['flex flex-col items-center gap-1.5', immersive && 'pointer-events-auto']"
       >
-        <span class="text-xs font-medium text-muted-foreground">{{ pad.label }}</span>
+        <span :class="['text-xs font-medium', immersive ? 'text-white drop-shadow' : 'text-muted-foreground']">{{ pad.label }}</span>
         <div
-          class="relative grid size-36 grid-cols-3 grid-rows-3 rounded-2xl border border-border bg-muted/70 shadow-inner select-none"
+          :class="['relative grid size-36 grid-cols-3 grid-rows-3 rounded-2xl border shadow-inner select-none',
+            immersive ? 'border-white/40 bg-white/25 backdrop-blur-sm' : 'border-border bg-muted/70']"
           style="touch-action: none"
           @pointerdown.prevent="padStart(pad.player, $event)"
           @pointermove.prevent="padEval(pad.player, $event)"
@@ -467,7 +542,17 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <p class="mt-4 hidden text-center text-xs text-muted-foreground sm:block">
+    <!-- "Bitte drehen": im Vollbild, solange das Gerät hochkant gehalten wird -->
+    <div
+      v-if="immersive && isPortrait"
+      class="absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 bg-brand-navy px-8 text-center text-white"
+    >
+      <span class="animate-pulse text-5xl">📱↻</span>
+      <h2 class="font-display text-2xl font-bold">Bitte dreh dein Gerät</h2>
+      <p class="max-w-xs text-sm text-white/80">Beach-Blobby spielt sich quer am besten – dreh dein Handy ins Querformat.</p>
+    </div>
+
+    <p v-if="!immersive" class="mt-4 hidden text-center text-xs text-muted-foreground sm:block">
       Spieler 1 (Coral): <kbd>A</kbd> <kbd>D</kbd> bewegen, <kbd>W</kbd> springen · Spieler 2 (Navy): <kbd>←</kbd> <kbd>→</kbd> bewegen, <kbd>↑</kbd> springen
     </p>
   </div>

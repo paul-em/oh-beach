@@ -9,29 +9,38 @@ useSeoMeta({ title: 'Beach-Blobby' })
 
 const { user } = useUserSession()
 
-// ---- Virtuelle Spielwelt (in dieser Auflösung wird gerechnet & gezeichnet) --
+// ---- Virtuelle Spielwelt --------------------------------------------------
+// Physik & Maße sind dem Original "Blobby Volley 2" (Open Source) nachempfunden,
+// damit sich der Ball gemächlich und kontrollierbar verhält. 800 Einheiten breit.
 const VW = 800
-const VH = 400
-const GROUND_Y = 350 // Oberkante Sand
-const R = 40 // Blob-Radius
-const REST_Y = GROUND_Y - R // Blob-Mittelpunkt am Boden
-const r = 16 // Ball-Radius
-const NET_X = VW / 2
-const NET_W = 10
-const NET_H = 120
-const NET_TOP = GROUND_Y - NET_H
+const VH = 524 // etwas Sand-Streifen unter der Bodenlinie
+const GROUND_Y = 500 // GROUND_PLANE_HEIGHT_MAX – Ball-Boden / Punktlinie
+const REST_Y = 455.5 // GROUND_PLANE_HEIGHT – Blob-Mittelpunkt am Boden
 
-const BLOB_SPEED = 5.5
-const BLOB_GRAV = 0.9
-const BLOB_JUMP = -16.5
-const BALL_GRAV = 0.15
-const BALL_MAX = 8
-const BALL_MIN_AFTER_HIT = 3
+// Blob = zwei Kugeln (oben kleiner, unten größer) wie im Original.
+const UPPER_OFF = 19 // BLOBBY_UPPER_SPHERE (Versatz nach oben)
+const UPPER_R = 25 // BLOBBY_UPPER_RADIUS
+const LOWER_OFF = 13 // BLOBBY_LOWER_SPHERE (Versatz nach unten)
+const LOWER_R = 33 // BLOBBY_LOWER_RADIUS
+const BLOB_HALF = LOWER_OFF + LOWER_R // 46 – untere Reichweite (Boden/Wand-Anschlag)
+
+const NET_X = 400 // NET_POSITION_X
+const NET_R = 7 // NET_RADIUS
+const NET_TOP = 284 // NET_SPHERE_POSITION – Mittelpunkt der oberen Netzkugel
+
+const BALL_R = 31.5 // BALL_RADIUS
+const BALL_GRAV = 0.287 // BALL_GRAVITATION
+const BALL_COLLISION_V = Math.sqrt(0.75 * 800 * BALL_GRAV) // ≈ 13.12 – feste Abprall-Geschw.
+
+const BLOB_GRAV = (15.1 * 15.1) / 293.625 // GRAVITATION ≈ 0.777
+const BLOB_JUMP = -15.1 // BLOBBY_JUMP_ACCELERATION (nach oben)
+const BLOB_SPEED = 4.5 // BLOBBY_SPEED (horizontal)
+const SERVE_Y = 300.5 // STANDARD_BALL_HEIGHT
 const SERVE_FRAMES = 50
 const POINTS_TO_WIN = 7
 
-const P1_START = 160
-const P2_START = VW - 160
+const P1_START = 200
+const P2_START = 600
 
 // ---- Reaktiver UI-Zustand (Overlays, Scoreboard) --------------------------
 const started = ref(false)
@@ -92,7 +101,7 @@ interface Ball { x: number; y: number; px: number; vx: number; vy: number; angle
 
 const p1: Blob = { x: P1_START, y: REST_Y, vy: 0, onGround: true }
 const p2: Blob = { x: P2_START, y: REST_Y, vy: 0, onGround: true }
-const ball: Ball = { x: P1_START, y: 120, px: P1_START, vx: 0, vy: 0, angle: 0 }
+const ball: Ball = { x: P1_START, y: SERVE_Y, px: P1_START, vx: 0, vy: 0, angle: 0 }
 let serveTimer = 0
 
 let canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -106,16 +115,11 @@ const STEP = 1000 / 60
 let ballImg: HTMLImageElement | null = null
 let faultierImg: HTMLImageElement | null = null
 let faultierRatio = 238 / 456 // Breite/Höhe, wird nach dem Laden exakt gesetzt
-const FAULTIER_SCALE = 1.3 // Höhe = 2*R * Scale
-const BALL_SCALE = 1.4
+const BLOB_DRAW_H = UPPER_OFF + UPPER_R + LOWER_OFF + LOWER_R // ~90 (Kopf bis Fuß)
+const FAULTIER_SCALE = 1.15 // Höhe = BLOB_DRAW_H * Scale
+const BALL_SCALE = 1.0
 function imgReady(img: HTMLImageElement | null): img is HTMLImageElement {
   return !!img && img.complete && img.naturalWidth > 0
-}
-
-function clampSpeed(b: Ball, max: number, min = 0) {
-  const s = Math.hypot(b.vx, b.vy)
-  if (s > max) { b.vx = (b.vx / s) * max; b.vy = (b.vy / s) * max }
-  else if (min && s > 0 && s < min) { b.vx = (b.vx / s) * min; b.vy = (b.vy / s) * min }
 }
 
 // Ball über dem Aufschläger (= Verlierer des letzten Ballwechsels) platzieren.
@@ -124,7 +128,7 @@ function resetServe(serverSide: 1 | 2) {
   p2.x = P2_START; p2.y = REST_Y; p2.vy = 0; p2.onGround = true
   ball.x = serverSide === 1 ? P1_START : P2_START
   ball.px = ball.x
-  ball.y = 110
+  ball.y = SERVE_Y
   ball.vx = 0; ball.vy = 0
   serveTimer = SERVE_FRAMES
   serving.value = true
@@ -172,74 +176,84 @@ function awardPoint(scorer: 1 | 2) {
 }
 
 function updateBlob(b: Blob, inp: { left: boolean; right: boolean; jump: boolean }, minX: number, maxX: number) {
-  const dir = (inp.right ? 1 : 0) - (inp.left ? 1 : 0)
-  b.x += dir * BLOB_SPEED
+  b.x += ((inp.right ? 1 : 0) - (inp.left ? 1 : 0)) * BLOB_SPEED
   if (b.x < minX) b.x = minX
   if (b.x > maxX) b.x = maxX
 
   if (inp.jump && b.onGround) { b.vy = BLOB_JUMP; b.onGround = false }
-  b.vy += BLOB_GRAV
-  b.y += b.vy
+  // Variabler Sprung: solange die Sprungtaste gehalten wird und der Blob steigt,
+  // wirkt etwas weniger Schwerkraft (entspricht dem JUMP_BUFFER im Original).
+  const g = BLOB_GRAV - (inp.jump && b.vy < 0 ? BLOB_GRAV / 2 : 0)
+  b.y += b.vy + 0.5 * g
+  b.vy += g
   if (b.y >= REST_Y) { b.y = REST_Y; b.vy = 0; b.onGround = true }
 }
 
+// Zwei-Kugel-Hitbox. Beim Treffer wird der Ball – wie im Original – auf eine
+// FESTE Geschwindigkeit in Richtung „vom Kugelmittelpunkt weg" gesetzt. Dadurch
+// baut sich keine Energie auf und der Ball bleibt jederzeit kontrollierbar;
+// die Richtung ergibt sich daraus, WO der Ball den Blob trifft.
 function collideBlob(b: Blob) {
-  const dx = ball.x - b.x
-  const dy = ball.y - b.y
-  const dist = Math.hypot(dx, dy)
-  const minDist = r + R
-  if (dist >= minDist) return
-  const nx = dist === 0 ? 0 : dx / dist
-  const ny = dist === 0 ? -1 : dy / dist
-  // Ball aus dem Blob herausschieben
-  ball.x = b.x + nx * minDist
-  ball.y = b.y + ny * minDist
-  // Reflexion entlang der Normalen, nur wenn sich der Ball annähert
-  const rvx = ball.vx
-  const rvy = ball.vy - b.vy
-  const vn = rvx * nx + rvy * ny
-  if (vn < 0) {
-    ball.vx -= 2 * vn * nx
-    ball.vy -= 2 * vn * ny
+  const spheres = [
+    { cx: b.x, cy: b.y - UPPER_OFF, rad: UPPER_R },
+    { cx: b.x, cy: b.y + LOWER_OFF, rad: LOWER_R },
+  ]
+  let hit: { cx: number; cy: number; dist: number; minD: number } | null = null
+  let bestOverlap = -1
+  for (const s of spheres) {
+    const dist = Math.hypot(ball.x - s.cx, ball.y - s.cy)
+    const minD = BALL_R + s.rad
+    const overlap = minD - dist
+    if (overlap > 0 && overlap > bestOverlap) {
+      bestOverlap = overlap
+      hit = { cx: s.cx, cy: s.cy, dist, minD }
+    }
   }
-  // Etwas Blob-Schwung mitgeben, Mindest-/Maximaltempo sichern
-  ball.vy += b.vy * 0.4
-  clampSpeed(ball, BALL_MAX, BALL_MIN_AFTER_HIT)
+  if (!hit) return
+  const nx = hit.dist === 0 ? 0 : (ball.x - hit.cx) / hit.dist
+  const ny = hit.dist === 0 ? -1 : (ball.y - hit.cy) / hit.dist
+  ball.x = hit.cx + nx * hit.minD // aus der Kugel schieben
+  ball.y = hit.cy + ny * hit.minD
+  ball.vx = nx * BALL_COLLISION_V
+  ball.vy = ny * BALL_COLLISION_V
 }
 
 function updateBall() {
   ball.px = ball.x
-  ball.vy += BALL_GRAV
-  clampSpeed(ball, BALL_MAX)
+  // Original-Integration: pos += vel + 0.5*g ; vel += g
   ball.x += ball.vx
-  ball.y += ball.vy
-  ball.angle += ball.vx * 0.03
+  ball.y += ball.vy + 0.5 * BALL_GRAV
+  ball.vy += BALL_GRAV
+  ball.angle += ball.vx * 0.02
 
   // Seitenwände
-  if (ball.x < r) { ball.x = r; ball.vx = Math.abs(ball.vx) }
-  if (ball.x > VW - r) { ball.x = VW - r; ball.vx = -Math.abs(ball.vx) }
-  // Decke (nur Begrenzung)
-  if (ball.y < r) { ball.y = r; ball.vy = Math.abs(ball.vy) }
+  if (ball.x - BALL_R < 0 && ball.vx < 0) { ball.vx = -ball.vx; ball.x = BALL_R }
+  if (ball.x + BALL_R > VW && ball.vx > 0) { ball.vx = -ball.vx; ball.x = VW - BALL_R }
+  // Decke (sanfte Begrenzung)
+  if (ball.y - BALL_R < 0 && ball.vy < 0) { ball.vy = -ball.vy; ball.y = BALL_R }
 
   // Netz
-  if (ball.x > NET_X - NET_W / 2 - r && ball.x < NET_X + NET_W / 2 + r) {
-    if (ball.y > NET_TOP) {
-      // seitlich am Netzpfosten -> zur näheren Seite abprallen
-      if (ball.px <= NET_X) { ball.x = NET_X - NET_W / 2 - r; ball.vx = -Math.abs(ball.vx) }
-      else { ball.x = NET_X + NET_W / 2 + r; ball.vx = Math.abs(ball.vx) }
-    } else {
-      // über der Netzkante -> Abprall an der runden Kappe
-      const dx = ball.x - NET_X
-      const dy = ball.y - NET_TOP
-      const dist = Math.hypot(dx, dy)
-      if (dist < r + NET_W / 2) {
-        const nx = dist === 0 ? 0 : dx / dist
-        const ny = dist === 0 ? -1 : dy / dist
-        const vn = ball.vx * nx + ball.vy * ny
-        if (vn < 0) { ball.vx -= 2 * vn * nx; ball.vy -= 2 * vn * ny }
-        ball.x = NET_X + nx * (r + NET_W / 2)
-        ball.y = NET_TOP + ny * (r + NET_W / 2)
+  if (ball.y >= NET_TOP && Math.abs(ball.x - NET_X) < BALL_R + NET_R) {
+    // seitlich am Netz
+    if (ball.px <= NET_X) { ball.vx = -Math.abs(ball.vx); ball.x = NET_X - BALL_R - NET_R }
+    else { ball.vx = Math.abs(ball.vx); ball.x = NET_X + BALL_R + NET_R }
+  } else if (ball.y < NET_TOP) {
+    // obere Netzkante (Kugel) – mit Dämpfung wie im Original
+    const dx = ball.x - NET_X
+    const dy = ball.y - NET_TOP
+    const dist = Math.hypot(dx, dy)
+    if (dist < BALL_R + NET_R) {
+      const nx = dist === 0 ? 0 : dx / dist
+      const ny = dist === 0 ? -1 : dy / dist
+      const vn = ball.vx * nx + ball.vy * ny
+      if (vn < 0) {
+        const perpx = vn * nx, perpy = vn * ny
+        const parax = ball.vx - perpx, paray = ball.vy - perpy
+        ball.vx = parax * 0.95 - perpx * 0.84
+        ball.vy = paray * 0.95 - perpy * 0.84
       }
+      ball.x = NET_X + nx * (BALL_R + NET_R)
+      ball.y = NET_TOP + ny * (BALL_R + NET_R)
     }
   }
 
@@ -247,8 +261,8 @@ function updateBall() {
   collideBlob(p2)
 
   // Boden -> Punkt für die Gegenseite
-  if (ball.y + r >= GROUND_Y) {
-    ball.y = GROUND_Y - r
+  if (ball.y + BALL_R >= GROUND_Y) {
+    ball.y = GROUND_Y - BALL_R
     awardPoint(ball.x < NET_X ? 2 : 1)
   }
 }
@@ -256,12 +270,12 @@ function updateBall() {
 function step() {
   if (!started.value || winner.value) return
   // Blobs lassen sich immer steuern (auch während des Aufschlag-Countdowns)
-  updateBlob(p1, input.p1, R, NET_X - NET_W / 2 - R)
-  updateBlob(p2, input.p2, NET_X + NET_W / 2 + R, VW - R)
+  updateBlob(p1, input.p1, LOWER_R, NET_X - NET_R - LOWER_R)
+  updateBlob(p2, input.p2, NET_X + NET_R + LOWER_R, VW - LOWER_R)
 
   if (serveTimer > 0) {
     serveTimer--
-    if (serveTimer === 0) { ball.vy = 2; serving.value = false }
+    if (serveTimer === 0) serving.value = false // Ball fällt dann mit der Schwerkraft
   } else {
     updateBall()
   }
@@ -281,48 +295,49 @@ function drawShadow(c: CanvasRenderingContext2D, x: number, y: number, rx: numbe
 }
 
 function drawBlob(c: CanvasRenderingContext2D, b: Blob, color: string, flip: boolean) {
-  drawShadow(c, b.x, b.y, R * 1.3)
+  drawShadow(c, b.x, b.y, LOWER_R * 1.25)
   if (imgReady(faultierImg)) {
-    const h = 2 * R * FAULTIER_SCALE
+    const h = BLOB_DRAW_H * FAULTIER_SCALE
     const w = h * faultierRatio
     c.save()
-    c.translate(b.x, b.y + R) // Ankerpunkt = Füße am Boden des Hitbox-Kreises
+    c.translate(b.x, b.y + BLOB_HALF) // Ankerpunkt = Füße (untere Kugel)
     if (flip) c.scale(-1, 1)
     c.drawImage(faultierImg, -w / 2, -h, w, h)
     c.restore()
     return
   }
-  // Fallback: einfacher Blob mit Augen
+  // Fallback: die zwei Kugeln + Augen
   c.save()
   c.fillStyle = color
-  c.beginPath(); c.arc(b.x, b.y, R, 0, Math.PI * 2); c.fill()
-  const eyeOffX = b.x < NET_X ? 8 : -8
-  for (const ex of [eyeOffX - 9, eyeOffX + 9]) {
+  c.beginPath(); c.arc(b.x, b.y + LOWER_OFF, LOWER_R, 0, Math.PI * 2); c.fill()
+  c.beginPath(); c.arc(b.x, b.y - UPPER_OFF, UPPER_R, 0, Math.PI * 2); c.fill()
+  const eyeOffX = b.x < NET_X ? 6 : -6
+  for (const ex of [eyeOffX - 8, eyeOffX + 8]) {
     const eyeX = b.x + ex
-    const eyeY = b.y - 12
+    const eyeY = b.y - UPPER_OFF - 4
     c.fillStyle = '#fff'
-    c.beginPath(); c.arc(eyeX, eyeY, 7, 0, Math.PI * 2); c.fill()
+    c.beginPath(); c.arc(eyeX, eyeY, 6, 0, Math.PI * 2); c.fill()
     const a = Math.atan2(ball.y - eyeY, ball.x - eyeX)
     c.fillStyle = '#13283d'
-    c.beginPath(); c.arc(eyeX + Math.cos(a) * 3, eyeY + Math.sin(a) * 3, 3.5, 0, Math.PI * 2); c.fill()
+    c.beginPath(); c.arc(eyeX + Math.cos(a) * 3, eyeY + Math.sin(a) * 3, 3, 0, Math.PI * 2); c.fill()
   }
   c.restore()
 }
 
 function drawBall(c: CanvasRenderingContext2D) {
-  drawShadow(c, ball.x, ball.y, r * 1.6)
+  drawShadow(c, ball.x, ball.y, BALL_R * 0.9)
   c.save()
   c.translate(ball.x, ball.y)
   c.rotate(ball.angle)
   if (imgReady(ballImg)) {
-    const d = 2 * r * BALL_SCALE
+    const d = 2 * BALL_R * BALL_SCALE
     c.drawImage(ballImg, -d / 2, -d / 2, d, d)
   } else {
     c.fillStyle = '#ffffff'
-    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill()
+    c.beginPath(); c.arc(0, 0, BALL_R, 0, Math.PI * 2); c.fill()
     c.strokeStyle = '#13283d'
     c.lineWidth = 1.5
-    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.stroke()
+    c.beginPath(); c.arc(0, 0, BALL_R, 0, Math.PI * 2); c.stroke()
   }
   c.restore()
 }
@@ -342,11 +357,11 @@ function render() {
   c.fillStyle = 'rgba(0,0,0,0.05)'
   c.fillRect(0, GROUND_Y, VW, 4)
 
-  // Netz
+  // Netz (Pfosten von der oberen Kugel bis zum Boden, Kugel oben)
   c.fillStyle = '#ffffff'
-  c.fillRect(NET_X - NET_W / 2, NET_TOP, NET_W, NET_H)
+  c.fillRect(NET_X - NET_R, NET_TOP, NET_R * 2, GROUND_Y - NET_TOP)
   c.fillStyle = '#13283d'
-  c.beginPath(); c.arc(NET_X, NET_TOP, NET_W / 2 + 1, 0, Math.PI * 2); c.fill()
+  c.beginPath(); c.arc(NET_X, NET_TOP, NET_R + 1, 0, Math.PI * 2); c.fill()
 
   // Spieler 1 links (normal), Spieler 2 rechts (gespiegelt -> schaut zum Netz)
   drawBlob(c, p1, '#ff6b5c', false)
@@ -466,12 +481,12 @@ onBeforeUnmount(() => {
     <!-- Spielfeld -->
     <div
       :class="immersive ? 'relative max-h-full max-w-full' : 'relative overflow-hidden rounded-xl border border-border shadow-sm'"
-      :style="immersive ? 'aspect-ratio: 800 / 400; width: min(100vw, 200dvh)' : ''"
+      :style="immersive ? 'aspect-ratio: 800 / 524; width: min(100vw, 152.7dvh)' : ''"
     >
       <canvas
         ref="canvasRef"
         :class="immersive ? 'block h-full w-full select-none' : 'block w-full select-none'"
-        style="touch-action: none; aspect-ratio: 800 / 400"
+        style="touch-action: none; aspect-ratio: 800 / 524"
       />
 
       <!-- Start-Overlay -->

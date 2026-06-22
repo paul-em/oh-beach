@@ -32,6 +32,7 @@ const BLOB_GRAV = (15.1 * 15.1) / 293.625 // GRAVITATION ≈ 0.777
 const BLOB_JUMP = -15.1 // BLOBBY_JUMP_ACCELERATION (nach oben)
 const BLOB_SPEED = 4.5 // BLOBBY_SPEED (horizontal)
 const SERVE_Y = 300.5 // STANDARD_BALL_HEIGHT
+const SERVE_COOLDOWN = 60 // Frames (~1 s) Verschnaufpause vor jedem Aufschlag
 const POINTS_TO_WIN = 7
 
 const P1_START = 200
@@ -43,6 +44,7 @@ const winner = ref<0 | 1 | 2>(0)
 const score1 = ref(0)
 const score2 = ref(0)
 const serving = ref(false)
+const cooldown = ref(0) // > 0 = kurze Pause, in der noch nichts passiert
 
 // ---- Mobile: Vollbild im Querformat ---------------------------------------
 // Am Handy macht das Spiel nur quer & im Vollbild Sinn (zwei D-Pads
@@ -119,6 +121,7 @@ function resetServe(serverSide: 1 | 2) {
   ball.y = SERVE_Y
   ball.vx = 0; ball.vy = 0
   serving.value = true
+  cooldown.value = SERVE_COOLDOWN
 }
 
 function startMatch() {
@@ -256,7 +259,10 @@ function updateBall() {
 
 function step() {
   if (!started.value || winner.value) return
-  // Blobs lassen sich immer steuern (auch während des Aufschlag-Countdowns)
+  // Kurze Verschnaufpause vor dem Aufschlag: alles bleibt stehen, damit es nach
+  // Spielstart bzw. nach einem Punkt nicht sofort wieder losgeht.
+  if (cooldown.value > 0) { cooldown.value--; return }
+  // Blobs lassen sich immer steuern (auch während des Aufschlags)
   updateBlob(p1, input.p1, LOWER_R, NET_X - NET_R - LOWER_R)
   updateBlob(p2, input.p2, NET_X + NET_R + LOWER_R, VW - LOWER_R)
 
@@ -500,7 +506,7 @@ onBeforeUnmount(() => {
 
       <!-- Aufschlag-Hinweis -->
       <div v-else-if="serving" class="pointer-events-none absolute inset-x-0 top-3 flex justify-center">
-        <span class="rounded-full bg-white/85 px-3 py-1 text-sm font-semibold text-brand-navy shadow">Aufschlag – berühre den Ball</span>
+        <span class="rounded-full bg-white/85 px-3 py-1 text-sm font-semibold text-brand-navy shadow">{{ cooldown > 0 ? 'Gleich geht\'s los …' : 'Aufschlag – berühre den Ball' }}</span>
       </div>
     </div>
 

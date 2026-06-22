@@ -20,6 +20,7 @@ Mitglieder liegen in einem Google Sheet, Reservierungen in einem Google Calendar
 - Mitglieder-Login, Passwort-Setzen/-Reset per E-Mail-Link
 - Platzreservierung in festen Stundenslots (08–22 Uhr, 14 Tage Vorlauf) inkl. Storno
 - Design-System „Sunny Beach" + Styleguide unter `/styleguide`
+- Beach-Blobby (`/mitglieder/spiel`) – Mini-Volleyball, lokal zu zweit **oder online** gegen andere Mitglieder (WebRTC P2P)
 
 ## Lokale Entwicklung
 
@@ -66,8 +67,33 @@ NUXT_PUBLIC_SITE_URL=http://localhost:3000
 | `NUXT_EMAIL_FROM` | Absenderadresse (verifizierte Domain) |
 | `NUXT_PUBLIC_SITE_URL` | Öffentliche Basis-URL (Links in E-Mails) |
 | `NUXT_PUBLIC_JOIN_FORM_URL` | Link zum bestehenden Google-Anmeldeformular |
+| `NUXT_PUBLIC_ICE_SERVERS` | *(optional)* JSON-Array mit ICE-Servern fürs Online-Spiel (inkl. TURN). Standard: öffentliche Google-STUN-Server |
 
 ➡️ **Externes Setup (Google Cloud, Sheet-Vorlage, Resend, Vercel):** siehe [`docs/SETUP.md`](docs/SETUP.md).
+
+### Online-Spiel (Beach-Blobby): geteilter Zustand für Lobby & Signaling
+
+Das Online-Spiel läuft Peer-to-Peer (WebRTC); der Server vermittelt nur Lobby
+und Verbindungsaufbau (Signaling) über `server/api/play/*`. Dieser Zustand liegt
+in Nitros Storage (`useStorage('play')`).
+
+- **Lokal/Dev:** funktioniert sofort (In-Memory).
+- **Produktion auf Vercel:** Serverless-Functions sind zustandslos – damit beide
+  Spieler dieselben Daten sehen, muss ein **geteilter Storage-Treiber** unter dem
+  Mount `play` konfiguriert werden, z. B. Vercel KV / Upstash Redis. Beispiel in
+  `nuxt.config.ts`:
+
+  ```ts
+  nitro: {
+    storage: {
+      play: { driver: 'upstash' /* oder 'vercelKV' */ },
+    },
+  }
+  ```
+
+  Ohne geteilten Treiber findet das Matchmaking online keine Gegenspieler.
+  Für zuverlässige Verbindungen über restriktive Netze zusätzlich einen
+  TURN-Server via `NUXT_PUBLIC_ICE_SERVERS` hinterlegen.
 
 ## Design-System „Sunny Beach"
 

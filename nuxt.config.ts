@@ -50,6 +50,13 @@ export default defineNuxtConfig({
       siteUrl: 'http://localhost:3000',
       // URL des bestehenden Google-Formulars für neue Mitglieder
       joinFormUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSeUxdkeZV4mdNCbM23P2rHGQp54I6eMzgIrh9TG_DKIwGzuNw/viewform?usp=dialog',
+      // ICE-Server fürs Online-Spiel (WebRTC). Standard: öffentliche STUN-Server.
+      // Für zuverlässige Verbindungen über restriktive Netze kann via
+      // NUXT_PUBLIC_ICE_SERVERS ein JSON-Array (inkl. TURN) gesetzt werden.
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+      ] as { urls: string | string[]; username?: string; credential?: string }[],
     },
   },
 

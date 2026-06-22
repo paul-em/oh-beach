@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
-import { Gamepad2, ChevronLeft, ChevronRight, ChevronUp } from '@lucide/vue'
+import { Gamepad2, ChevronLeft, ChevronRight, ChevronUp, Users, Globe, Loader2 } from '@lucide/vue'
 
 definePageMeta({ middleware: 'auth' })
 useSeoMeta({ title: 'Beach-Blobby' })
@@ -38,6 +38,20 @@ const POINTS_TO_WIN = 7
 const P1_START = 200
 const P2_START = 600
 
+// Bewegungsgrenzen je Spielfeldseite (linke/rechte Hälfte, Netz in der Mitte).
+const P1_MIN = LOWER_R
+const P1_MAX = NET_X - NET_R - LOWER_R
+const P2_MIN = NET_X + NET_R + LOWER_R
+const P2_MAX = VW - LOWER_R
+
+// ---- Spielmodus -----------------------------------------------------------
+// 'local' = zwei Spieler an einem Gerät (wie bisher). 'online' = je ein Spieler
+// pro Gerät, verbunden über WebRTC. mode === null -> Auswahlmenü.
+const mode = ref<'local' | 'online' | null>(null)
+const net = usePlayNetwork()
+const { phase: netPhase, role: netRole, openMatches, opponentName: oppName, statusText: netStatus, errorText: netError } = net
+const netDisconnected = ref(false)
+
 // ---- Reaktiver UI-Zustand (Overlays, Scoreboard) --------------------------
 const started = ref(false)
 const winner = ref<0 | 1 | 2>(0)
@@ -46,15 +60,22 @@ const score2 = ref(0)
 const serving = ref(false)
 const cooldown = ref(0) // > 0 = kurze Pause, in der noch nichts passiert
 
+const inGame = computed(() =>
+  (mode.value === 'local' && started.value) || (mode.value === 'online' && netPhase.value === 'playing'),
+)
+// Im Online-Spiel ist der Host immer links (p1), der Gast rechts (p2).
+const leftLabel = computed(() =>
+  mode.value === 'online' ? (netRole.value === 'host' ? 'Du' : oppName.value || 'Host') : 'Links',
+)
+const rightLabel = computed(() =>
+  mode.value === 'online' ? (netRole.value === 'guest' ? 'Du' : oppName.value || 'Gast') : 'Rechts',
+)
+
 // ---- Mobile: Vollbild im Querformat ---------------------------------------
-// Am Handy macht das Spiel nur quer & im Vollbild Sinn (zwei D-Pads
-// nebeneinander, breites Spielfeld). Wir wechseln darum beim Start in einen
-// immersiven Layout-Modus, versuchen echtes Vollbild + Orientierungs-Lock und
-// blenden ansonsten einen "bitte drehen"-Hinweis ein.
 const isTouch = ref(false)
 const isPortrait = ref(false)
 const gameRoot = ref<HTMLElement | null>(null)
-const immersive = computed(() => isTouch.value && started.value)
+const immersive = computed(() => isTouch.value && inGame.value)
 
 // ---- Eingaben (bewusst NICHT reaktiv – wird pro Frame gelesen) -------------
 type Ctrl = 'left' | 'right' | 'jump'
@@ -63,9 +84,13 @@ const input = {
   p1: { left: false, right: false, jump: false },
   p2: { left: false, right: false, jump: false },
 }
+// Welche Seite der lokale Spieler online steuert.
+const localPlayer = computed<Player>(() => (netRole.value === 'guest' ? 'p2' : 'p1'))
+function localInput() {
+  return mode.value === 'online' ? input[localPlayer.value] : null
+}
 
 // D-Pad (mobil): Richtung ergibt sich aus der Daumenposition relativ zur Mitte.
-// Erlaubt Diagonalen (z. B. oben-links = springen + nach links).
 function padEval(player: Player, e: PointerEvent) {
   const el = e.currentTarget as HTMLElement
   const rect = el.getBoundingClientRect()
@@ -124,16 +149,66 @@ function resetServe(serverSide: 1 | 2) {
   cooldown.value = SERVE_COOLDOWN
 }
 
-function startMatch() {
+function resetIdle() {
+  p1.x = P1_START; p1.y = REST_Y; p1.vy = 0; p1.onGround = true
+  p2.x = P2_START; p2.y = REST_Y; p2.vy = 0; p2.onGround = true
+  ball.x = P1_START; ball.px = P1_START; ball.y = SERVE_Y; ball.vx = 0; ball.vy = 0; ball.angle = 0
+}
+
+function beginMatch() {
   score1.value = 0; score2.value = 0; winner.value = 0
   started.value = true
-  if (isTouch.value) enterImmersive()
   resetServe(Math.random() < 0.5 ? 1 : 2)
 }
 
-// Echtes Vollbild + Querformat-Lock (best effort – iOS unterstützt beides
-// nicht, dort sorgt das CSS-Vollbild + der Dreh-Hinweis für ein brauchbares
-// Erlebnis). Muss aus einer User-Geste heraus aufgerufen werden.
+// ---- Modusauswahl & Lobby --------------------------------------------------
+function chooseLocal() {
+  mode.value = 'local'
+  if (isTouch.value) enterImmersive()
+  beginMatch()
+}
+function chooseOnline() {
+  mode.value = 'online'
+  net.startLobby()
+}
+async function openGame() {
+  try { await net.host() } catch { /* z. B. Netzwerkfehler – Lobby bleibt offen */ }
+}
+async function joinOpen(id: string) {
+  try { await net.join(id) } catch { await net.refreshLobby() }
+}
+function cancelConnecting() {
+  net.leave()
+  net.startLobby()
+}
+function backToMenu() {
+  exitImmersive()
+  if (mode.value === 'online') { net.leave(); net.stopLobby() }
+  mode.value = null
+  started.value = false
+  winner.value = 0
+  netDisconnected.value = false
+  resetIdle()
+}
+function backToLobby() {
+  netDisconnected.value = false
+  started.value = false
+  winner.value = 0
+  net.leave()
+  net.startLobby()
+}
+// Revanche: nur der Host steuert den Spielablauf; der Gast folgt per Snapshot.
+function rematch() {
+  if (mode.value === 'online') {
+    if (netRole.value !== 'host') return
+    winner.value = 0
+    resetServe(Math.random() < 0.5 ? 1 : 2)
+  } else {
+    beginMatch()
+  }
+}
+
+// Echtes Vollbild + Querformat-Lock (best effort). Muss aus einer User-Geste kommen.
 async function enterImmersive() {
   const el = gameRoot.value
   try {
@@ -144,17 +219,9 @@ async function enterImmersive() {
     await orientation?.lock?.('landscape')
   } catch { /* Lock nicht unterstützt (z. B. iOS) */ }
 }
-
 function exitImmersive() {
   try { (screen.orientation as ScreenOrientation & { unlock?: () => void })?.unlock?.() } catch { /* egal */ }
   if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {})
-}
-
-// Spiel verlassen (Button im Vollbild) -> zurück zum Start-Overlay.
-function leaveGame() {
-  exitImmersive()
-  started.value = false
-  winner.value = 0
 }
 
 function awardPoint(scorer: 1 | 2) {
@@ -180,9 +247,7 @@ function updateBlob(b: Blob, inp: { left: boolean; right: boolean; jump: boolean
 }
 
 // Zwei-Kugel-Hitbox. Beim Treffer wird der Ball – wie im Original – auf eine
-// FESTE Geschwindigkeit in Richtung „vom Kugelmittelpunkt weg" gesetzt. Dadurch
-// baut sich keine Energie auf und der Ball bleibt jederzeit kontrollierbar;
-// die Richtung ergibt sich daraus, WO der Ball den Blob trifft.
+// FESTE Geschwindigkeit in Richtung „vom Kugelmittelpunkt weg" gesetzt.
 function collideBlob(b: Blob) {
   const spheres = [
     { cx: b.x, cy: b.y - UPPER_OFF, rad: UPPER_R },
@@ -224,11 +289,9 @@ function updateBall() {
 
   // Netz
   if (ball.y >= NET_TOP && Math.abs(ball.x - NET_X) < BALL_R + NET_R) {
-    // seitlich am Netz
     if (ball.px <= NET_X) { ball.vx = -Math.abs(ball.vx); ball.x = NET_X - BALL_R - NET_R }
     else { ball.vx = Math.abs(ball.vx); ball.x = NET_X + BALL_R + NET_R }
   } else if (ball.y < NET_TOP) {
-    // obere Netzkante (Kugel) – mit Dämpfung wie im Original
     const dx = ball.x - NET_X
     const dy = ball.y - NET_TOP
     const dist = Math.hypot(dx, dy)
@@ -257,19 +320,15 @@ function updateBall() {
   }
 }
 
-function step() {
-  if (!started.value || winner.value) return
-  // Kurze Verschnaufpause vor dem Aufschlag: alles bleibt stehen, damit es nach
-  // Spielstart bzw. nach einem Punkt nicht sofort wieder losgeht.
+// Ein Simulationsschritt der maßgeblichen Physik (lokal & Host teilen ihn sich).
+function simulate(p2Input: { left: boolean; right: boolean; jump: boolean }) {
+  if (winner.value) return
   if (cooldown.value > 0) { cooldown.value--; return }
-  // Blobs lassen sich immer steuern (auch während des Aufschlags)
-  updateBlob(p1, input.p1, LOWER_R, NET_X - NET_R - LOWER_R)
-  updateBlob(p2, input.p2, NET_X + NET_R + LOWER_R, VW - LOWER_R)
-
+  updateBlob(p1, input.p1, P1_MIN, P1_MAX)
+  updateBlob(p2, p2Input, P2_MIN, P2_MAX)
   if (serving.value) {
-    // Beim Aufschlag schwebt der Ball über dem Aufschläger und fällt NICHT von
-    // selbst – er bleibt liegen, bis ihn ein Blob berührt. Erst diese Berührung
-    // setzt ihn (über den festen Abprall-Impuls) in Bewegung und startet den Ballwechsel.
+    // Ball schwebt beim Aufschlag und fällt nicht von selbst – erst eine
+    // Berührung setzt ihn in Bewegung und startet den Ballwechsel.
     collideBlob(p1)
     collideBlob(p2)
     if (ball.vx !== 0 || ball.vy !== 0) serving.value = false
@@ -278,9 +337,82 @@ function step() {
   }
 }
 
+// ---- Netzwerk-Protokoll (über den WebRTC DataChannel) ----------------------
+// Host -> Gast: ['s', seq, p1x,p1y, p2x,p2y, bx,by,bangle, s1,s2, serving, cooldown, winner]
+// Gast -> Host: ['i', left, right, jump]
+interface Snap {
+  seq: number; p1x: number; p1y: number; p2x: number; p2y: number
+  bx: number; by: number; ba: number; s1: number; s2: number; sv: number; cd: number; win: 0 | 1 | 2
+}
+let snapSeq = 0
+let lastSnapSeq = -1
+let lastSnap: Snap | null = null
+
+function sendSnapshot() {
+  net.send([
+    's', snapSeq++,
+    Math.round(p1.x), Math.round(p1.y), Math.round(p2.x), Math.round(p2.y),
+    Math.round(ball.x), Math.round(ball.y), Number(ball.angle.toFixed(2)),
+    score1.value, score2.value, serving.value ? 1 : 0, cooldown.value, winner.value,
+  ])
+}
+
+function onNetMessage(msg: unknown) {
+  if (!Array.isArray(msg)) return
+  if (msg[0] === 'i' && netRole.value === 'host') {
+    input.p2.left = !!msg[1]; input.p2.right = !!msg[2]; input.p2.jump = !!msg[3]
+  } else if (msg[0] === 's' && netRole.value === 'guest') {
+    const seq = msg[1] as number
+    if (seq <= lastSnapSeq) return // veraltetes Paket (Channel ist ungeordnet)
+    lastSnapSeq = seq
+    lastSnap = {
+      seq, p1x: msg[2], p1y: msg[3], p2x: msg[4], p2y: msg[5],
+      bx: msg[6], by: msg[7], ba: msg[8], s1: msg[9], s2: msg[10], sv: msg[11], cd: msg[12], win: msg[13] as 0 | 1 | 2,
+    }
+  }
+}
+
+function hostStep() {
+  simulate(input.p2) // p2-Eingaben kommen vom Gast übers Netz
+  sendSnapshot()
+}
+
+function guestStep() {
+  const inp = input.p2
+  net.send(['i', inp.left ? 1 : 0, inp.right ? 1 : 0, inp.jump ? 1 : 0])
+  const snap = lastSnap
+  if (!snap) return
+  // Gegner (Host = p1) und Ball aus dem autoritativen Zustand übernehmen.
+  p1.x = snap.p1x; p1.y = snap.p1y
+  ball.x = snap.bx; ball.y = snap.by; ball.angle = snap.ba
+  score1.value = snap.s1; score2.value = snap.s2
+  serving.value = !!snap.sv; cooldown.value = snap.cd; winner.value = snap.win
+  // Eigene Seite (p2) lokal vorhersagen, damit sich die Steuerung direkt
+  // anfühlt; bei großer Abweichung zum Host-Zustand korrigieren (Anti-Desync).
+  const frozen = snap.cd > 0 || snap.win !== 0
+  if (frozen) {
+    p2.x = snap.p2x; p2.y = snap.p2y; p2.vy = 0; p2.onGround = true
+  } else {
+    updateBlob(p2, inp, P2_MIN, P2_MAX)
+    if (Math.abs(p2.x - snap.p2x) > 35) p2.x = snap.p2x
+    if (Math.abs(p2.y - snap.p2y) > 60) { p2.y = snap.p2y; p2.vy = 0 }
+  }
+}
+
+function step() {
+  if (mode.value === 'online') {
+    if (netPhase.value !== 'playing') return
+    if (netRole.value === 'host') hostStep()
+    else guestStep()
+    return
+  }
+  // Lokal: beide Seiten an einem Gerät.
+  if (!started.value) return
+  simulate(input.p2)
+}
+
 // ---- Zeichnen --------------------------------------------------------------
 function drawShadow(c: CanvasRenderingContext2D, x: number, y: number, rx: number) {
-  // Bodenschatten – schrumpft, je höher das Objekt über dem Boden ist.
   const lift = Math.max(0, GROUND_Y - y)
   const scale = Math.max(0.4, 1 - lift / 320)
   c.save()
@@ -297,13 +429,12 @@ function drawBlob(c: CanvasRenderingContext2D, b: Blob, color: string, flip: boo
     const h = BLOB_DRAW_H * FAULTIER_SCALE
     const w = h * faultierRatio
     c.save()
-    c.translate(b.x, b.y + BLOB_HALF) // Ankerpunkt = Füße (untere Kugel)
+    c.translate(b.x, b.y + BLOB_HALF)
     if (flip) c.scale(-1, 1)
     c.drawImage(faultierImg, -w / 2, -h, w, h)
     c.restore()
     return
   }
-  // Fallback: die zwei Kugeln + Augen
   c.save()
   c.fillStyle = color
   c.beginPath(); c.arc(b.x, b.y + LOWER_OFF, LOWER_R, 0, Math.PI * 2); c.fill()
@@ -342,28 +473,23 @@ function drawBall(c: CanvasRenderingContext2D) {
 function render() {
   const c = ctx
   if (!c) return
-  // Himmel
   const sky = c.createLinearGradient(0, 0, 0, GROUND_Y)
   sky.addColorStop(0, '#bfe8ff')
   sky.addColorStop(1, '#eaf7ff')
   c.fillStyle = sky
   c.fillRect(0, 0, VW, GROUND_Y)
-  // Sand
   c.fillStyle = '#e7d29a'
   c.fillRect(0, GROUND_Y, VW, VH - GROUND_Y)
   c.fillStyle = 'rgba(0,0,0,0.05)'
   c.fillRect(0, GROUND_Y, VW, 4)
 
-  // Netz (Pfosten von der oberen Kugel bis zum Boden, Kugel oben)
   c.fillStyle = '#ffffff'
   c.fillRect(NET_X - NET_R, NET_TOP, NET_R * 2, GROUND_Y - NET_TOP)
   c.fillStyle = '#13283d'
   c.beginPath(); c.arc(NET_X, NET_TOP, NET_R + 1, 0, Math.PI * 2); c.fill()
 
-  // Spieler 1 links (normal), Spieler 2 rechts (gespiegelt -> schaut zum Netz)
   drawBlob(c, p1, '#ff6b5c', false)
   drawBlob(c, p2, '#13283d', true)
-
   drawBall(c)
 }
 
@@ -382,8 +508,21 @@ const KEY_MAP: Record<string, [('p1' | 'p2'), Ctrl]> = {
   KeyA: ['p1', 'left'], KeyD: ['p1', 'right'], KeyW: ['p1', 'jump'],
   ArrowLeft: ['p2', 'left'], ArrowRight: ['p2', 'right'], ArrowUp: ['p2', 'jump'],
 }
+// Online steuert jeder nur seine eigene Seite – beide Tastenschemata greifen.
+const ONLINE_KEY: Record<string, Ctrl> = {
+  KeyA: 'left', ArrowLeft: 'left', KeyD: 'right', ArrowRight: 'right',
+  KeyW: 'jump', ArrowUp: 'jump', Space: 'jump',
+}
 function onKey(down: boolean) {
   return (e: KeyboardEvent) => {
+    if (mode.value === 'online') {
+      const ctrl = ONLINE_KEY[e.code]
+      const inp = localInput()
+      if (!ctrl || !inp) return
+      e.preventDefault()
+      inp[ctrl] = down
+      return
+    }
     const m = KEY_MAP[e.code]
     if (!m) return
     e.preventDefault()
@@ -416,9 +555,25 @@ function loadSprites() {
 const portraitMq = import.meta.client ? window.matchMedia('(orientation: portrait)') : null
 function updateOrientation() { if (portraitMq) isPortrait.value = portraitMq.matches }
 
+// Online: auf "verbunden" reagieren (Spiel starten) und Verbindungsabbruch behandeln.
+watch(netPhase, (p) => {
+  if (p !== 'playing') return
+  netDisconnected.value = false
+  lastSnap = null; lastSnapSeq = -1; snapSeq = 0
+  input.p1.left = input.p1.right = input.p1.jump = false
+  input.p2.left = input.p2.right = input.p2.jump = false
+  if (isTouch.value) enterImmersive()
+  if (netRole.value === 'host') beginMatch()
+  else { started.value = true; winner.value = 0; score1.value = 0; score2.value = 0 }
+})
+function onNetClose() {
+  if (mode.value === 'online' && netPhase.value === 'playing') netDisconnected.value = true
+}
+
 onMounted(() => {
   setupCanvas()
   loadSprites()
+  net.setHandlers({ onData: onNetMessage, onClose: onNetClose })
   isTouch.value = window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window
   updateOrientation()
   portraitMq?.addEventListener('change', updateOrientation)
@@ -430,10 +585,16 @@ onMounted(() => {
 onBeforeUnmount(() => {
   cancelAnimationFrame(raf)
   exitImmersive()
+  net.dispose()
   portraitMq?.removeEventListener('change', updateOrientation)
   window.removeEventListener('keydown', keydown)
   window.removeEventListener('keyup', keyup)
 })
+
+function timeAgo(ts: number): string {
+  const s = Math.max(0, Math.round((Date.now() - ts) / 1000))
+  return s < 60 ? `vor ${s}s` : `vor ${Math.round(s / 60)}min`
+}
 </script>
 
 <template>
@@ -458,13 +619,14 @@ onBeforeUnmount(() => {
 
     <!-- Scoreboard (im Vollbild als Overlay oben) -->
     <div
+      v-if="inGame"
       :class="immersive
         ? 'pointer-events-none absolute inset-x-0 top-2 z-20 flex items-center justify-center gap-3 font-display text-base text-white drop-shadow'
         : 'mb-3 flex items-center justify-center gap-4 font-display text-lg'"
     >
-      <span>Links</span>
+      <span>{{ leftLabel }}</span>
       <span class="rounded-md bg-brand-navy px-3 py-1 font-bold text-white tabular-nums">{{ score1 }} : {{ score2 }}</span>
-      <span>Rechts</span>
+      <span>{{ rightLabel }}</span>
     </div>
 
     <!-- Vollbild verlassen -->
@@ -472,7 +634,7 @@ onBeforeUnmount(() => {
       v-if="immersive"
       type="button"
       class="absolute right-3 top-2 z-20 rounded-full bg-white/85 px-3 py-1 text-sm font-semibold text-brand-navy shadow"
-      @click="leaveGame"
+      @click="backToMenu"
     >Beenden</button>
 
     <!-- Spielfeld -->
@@ -486,44 +648,102 @@ onBeforeUnmount(() => {
         style="touch-action: none; aspect-ratio: 800 / 524"
       />
 
-      <!-- Start-Overlay -->
-      <div v-if="!started" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-brand-navy/70 px-6 text-center text-white backdrop-blur-sm">
+      <!-- Modus-Auswahl -->
+      <div v-if="mode === null" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-brand-navy/70 px-6 text-center text-white backdrop-blur-sm">
         <h2 class="font-display text-2xl font-bold">Bereit zum Match?</h2>
-        <Button size="lg" @click="startMatch">Spiel starten</Button>
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <Button size="lg" class="gap-2" @click="chooseLocal"><Users class="size-5" /> Lokal spielen</Button>
+          <Button size="lg" variant="secondary" class="gap-2" @click="chooseOnline"><Globe class="size-5" /> Online spielen</Button>
+        </div>
         <p class="max-w-md text-xs text-white/70">
-          Tastatur: links = A / D bewegen, W springen · rechts = ◀ / ▶ bewegen, ▲ springen.
-          Am Handy startet das Spiel quer im Vollbild – die D-Pads in den unteren Ecken steuern je eine Seite.
+          Lokal: zwei Spieler an einem Gerät. Online: gegen ein anderes eingeloggtes Mitglied – eröffne ein Spiel oder tritt einem bei.
         </p>
       </div>
 
+      <!-- Online-Lobby -->
+      <div v-else-if="mode === 'online' && netPhase === 'lobby'" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-brand-navy/75 px-6 text-center text-white backdrop-blur-sm">
+        <h2 class="font-display text-2xl font-bold">Online-Lobby</h2>
+        <div class="w-full max-w-sm rounded-xl bg-white/10 p-3 text-left">
+          <p class="mb-2 px-1 text-xs uppercase tracking-wide text-white/60">Offene Spiele</p>
+          <ul v-if="openMatches.length" class="flex max-h-44 flex-col gap-1.5 overflow-y-auto">
+            <li v-for="m in openMatches" :key="m.id" class="flex items-center justify-between gap-2 rounded-lg bg-white/10 px-3 py-2">
+              <span class="truncate text-sm font-medium">{{ m.hostName }}<span class="ml-2 text-xs text-white/50">{{ timeAgo(m.createdAt) }}</span></span>
+              <Button size="sm" @click="joinOpen(m.id)">Beitreten</Button>
+            </li>
+          </ul>
+          <p v-else class="px-1 py-3 text-sm text-white/60">Gerade wartet niemand – eröffne ein Spiel und lass dich herausfordern.</p>
+        </div>
+        <div class="flex gap-3">
+          <Button size="lg" class="gap-2" @click="openGame"><Globe class="size-5" /> Spiel eröffnen</Button>
+          <Button size="lg" variant="ghost" class="text-white hover:text-white" @click="backToMenu">Zurück</Button>
+        </div>
+      </div>
+
+      <!-- Verbindungsaufbau -->
+      <div v-else-if="mode === 'online' && netPhase === 'connecting'" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-brand-navy/80 px-6 text-center text-white backdrop-blur-sm">
+        <Loader2 class="size-10 animate-spin" />
+        <h2 class="font-display text-xl font-bold">{{ netStatus }}</h2>
+        <p v-if="oppName" class="text-white/70">Gegner: {{ oppName }}</p>
+        <Button variant="ghost" class="text-white hover:text-white" @click="cancelConnecting">Abbrechen</Button>
+      </div>
+
+      <!-- Verbindungsfehler -->
+      <div v-else-if="mode === 'online' && netPhase === 'error'" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-brand-navy/85 px-6 text-center text-white backdrop-blur-sm">
+        <span class="text-4xl">📡</span>
+        <h2 class="font-display text-xl font-bold">Verbindung fehlgeschlagen</h2>
+        <p class="max-w-xs text-sm text-white/75">{{ netError || 'Es konnte keine direkte Verbindung aufgebaut werden.' }}</p>
+        <Button class="mt-1" @click="backToLobby">Zur Lobby</Button>
+      </div>
+
+      <!-- Verbindung getrennt -->
+      <div v-else-if="netDisconnected" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-brand-navy/85 px-6 text-center text-white backdrop-blur-sm">
+        <span class="text-4xl">🔌</span>
+        <h2 class="font-display text-xl font-bold">Verbindung getrennt</h2>
+        <p class="max-w-xs text-sm text-white/75">Der andere Spieler ist nicht mehr erreichbar.</p>
+        <div class="mt-1 flex gap-3">
+          <Button @click="backToLobby">Zur Lobby</Button>
+          <Button variant="ghost" class="text-white hover:text-white" @click="backToMenu">Menü</Button>
+        </div>
+      </div>
+
       <!-- Sieg-Overlay -->
-      <div v-else-if="winner" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-brand-navy/75 px-6 text-center text-white backdrop-blur-sm">
+      <div v-else-if="inGame && winner" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-brand-navy/75 px-6 text-center text-white backdrop-blur-sm">
         <span class="text-4xl">🏐🎉</span>
-        <h2 class="font-display text-3xl font-bold">{{ winner === 1 ? 'Links' : 'Rechts' }} gewinnt!</h2>
+        <h2 class="font-display text-3xl font-bold">{{ winner === 1 ? leftLabel : rightLabel }} gewinnt!</h2>
         <p class="text-white/80">Endstand {{ score1 }} : {{ score2 }}</p>
-        <Button size="lg" class="mt-1" @click="startMatch">Revanche</Button>
+        <template v-if="mode === 'online' && netRole === 'guest'">
+          <p class="mt-1 text-sm text-white/70">Warte auf den Host für eine Revanche …</p>
+          <Button variant="ghost" class="text-white hover:text-white" @click="backToLobby">Zur Lobby</Button>
+        </template>
+        <template v-else>
+          <Button size="lg" class="mt-1" @click="rematch">Revanche</Button>
+          <Button variant="ghost" class="text-white hover:text-white" @click="backToMenu">Beenden</Button>
+        </template>
       </div>
 
       <!-- Aufschlag-Hinweis -->
-      <div v-else-if="serving" class="pointer-events-none absolute inset-x-0 top-3 flex justify-center">
+      <div v-else-if="inGame && serving" class="pointer-events-none absolute inset-x-0 top-3 flex justify-center">
         <span class="rounded-full bg-white/85 px-3 py-1 text-sm font-semibold text-brand-navy shadow">{{ cooldown > 0 ? 'Gleich geht\'s los …' : 'Aufschlag – berühre den Ball' }}</span>
       </div>
     </div>
 
-    <!-- Touch-Steuerung: D-Pad je Spieler (Diagonale = springen + laufen).
-         Im Vollbild als Overlay in den unteren Ecken, sonst unter dem Feld. -->
+    <!-- Touch-Steuerung: D-Pad. Lokal zwei (je Seite), online nur das eigene. -->
     <div
+      v-if="inGame"
       :class="immersive
-        ? 'pointer-events-none fixed inset-x-0 bottom-3 z-20 flex items-end justify-between px-4'
-        : 'mt-4 flex items-start justify-between gap-4 sm:hidden'"
+        ? 'pointer-events-none fixed inset-x-0 bottom-3 z-20 flex items-end px-4'
+        : 'mt-4 flex items-start gap-4 sm:hidden'"
+      :style="mode === 'online' ? 'justify-content: center' : 'justify-content: space-between'"
     >
       <div
-        v-for="pad in ([
-          { player: 'p1', label: 'Links', color: 'text-brand-coral' },
-          { player: 'p2', label: 'Rechts', color: 'text-brand-navy' },
-        ] as const)"
+        v-for="pad in (mode === 'online'
+          ? [{ player: localPlayer, label: 'Du', color: netRole === 'guest' ? 'text-brand-navy' : 'text-brand-coral' }]
+          : ([
+            { player: 'p1', label: 'Links', color: 'text-brand-coral' },
+            { player: 'p2', label: 'Rechts', color: 'text-brand-navy' },
+          ] as const))"
         :key="pad.player"
-        :class="['flex flex-col items-center gap-1.5', immersive && 'pointer-events-auto']"
+        :class="['flex flex-1 flex-col items-center gap-1.5', immersive && 'pointer-events-auto', mode === 'online' && 'max-w-44']"
       >
         <span :class="['text-xs font-medium', immersive ? 'text-white drop-shadow' : 'text-muted-foreground']">{{ pad.label }}</span>
         <div
@@ -554,8 +774,11 @@ onBeforeUnmount(() => {
       <p class="max-w-xs text-sm text-white/80">Beach-Blobby spielt sich quer am besten – dreh dein Handy ins Querformat.</p>
     </div>
 
-    <p v-if="!immersive" class="mt-4 hidden text-center text-xs text-muted-foreground sm:block">
+    <p v-if="!immersive && mode === 'local'" class="mt-4 hidden text-center text-xs text-muted-foreground sm:block">
       Spieler 1 (Coral): <kbd>A</kbd> <kbd>D</kbd> bewegen, <kbd>W</kbd> springen · Spieler 2 (Navy): <kbd>←</kbd> <kbd>→</kbd> bewegen, <kbd>↑</kbd> springen
+    </p>
+    <p v-else-if="!immersive && mode === 'online' && inGame" class="mt-4 hidden text-center text-xs text-muted-foreground sm:block">
+      Deine Seite ({{ netRole === 'guest' ? 'rechts' : 'links' }}): <kbd>A</kbd>/<kbd>←</kbd> <kbd>D</kbd>/<kbd>→</kbd> bewegen, <kbd>W</kbd>/<kbd>↑</kbd>/<kbd>Leertaste</kbd> springen
     </p>
   </div>
 </template>

@@ -65,6 +65,11 @@ export function usePlayNetwork() {
   let remoteReady = false
   const seenSignals = new Set<string>()
 
+  // Verbindungs-Stabilität: einmal verbunden? plus Timeouts gegen Hänger/Aussetzer.
+  let connected = false
+  let connectTimeout: ReturnType<typeof setTimeout> | null = null
+  let disconnectGrace: ReturnType<typeof setTimeout> | null = null
+
   function setHandlers(opts: { onData: (msg: unknown) => void; onClose: () => void }) {
     onData = opts.onData
     onClose = opts.onClose
@@ -108,7 +113,7 @@ export function usePlayNetwork() {
           await beginWebRtc('host')
         }
       } catch { /* weiter versuchen */ }
-    }, 1500)
+    }, 1000)
   }
 
   async function join(id: string) {
@@ -134,15 +139,30 @@ export function usePlayNetwork() {
 
   async function beginWebRtc(r: PlayRole) {
     statusText.value = 'Stelle Verbindung her …'
-    pc = new RTCPeerConnection({ iceServers })
+    connected = false
+    pc = new RTCPeerConnection({ iceServers, iceCandidatePoolSize: 4 })
 
     pc.onicecandidate = (e) => {
       if (e.candidate) postSignal('ice', e.candidate.toJSON())
     }
     pc.onconnectionstatechange = () => {
       if (!pc) return
-      if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
-        fail('Verbindung verloren.')
+      const st = pc.connectionState
+      if (st === 'connected') {
+        if (disconnectGrace) { clearTimeout(disconnectGrace); disconnectGrace = null }
+      } else if (st === 'failed') {
+        handleConnLost('Verbindung fehlgeschlagen.')
+      } else if (st === 'disconnected') {
+        // 'disconnected' ist oft nur ein kurzer Aussetzer und erholt sich wieder
+        // -> erst nach einer Gnadenfrist wirklich abbrechen.
+        if (!disconnectGrace) {
+          disconnectGrace = setTimeout(() => {
+            disconnectGrace = null
+            if (pc && (pc.connectionState === 'disconnected' || pc.connectionState === 'failed')) {
+              handleConnLost('Verbindung verloren.')
+            }
+          }, 8000)
+        }
       }
     }
 
@@ -156,17 +176,37 @@ export function usePlayNetwork() {
       pc.ondatachannel = (e) => wireChannel(e.channel)
     }
 
-    // Signaling-Postfach pollen, bis die Verbindung steht.
-    signalTimer = setInterval(pollSignals, 700)
+    // Hängt der Handshake (z. B. NAT ohne TURN), nicht ewig "Verbinde …" zeigen.
+    connectTimeout = setTimeout(() => {
+      if (!connected) fail('Zeitüberschreitung beim Verbindungsaufbau. Bitte erneut versuchen.')
+    }, 25000)
+
+    // Signaling-Postfach zügig pollen, bis die Verbindung steht.
+    signalTimer = setInterval(pollSignals, 450)
     pollSignals()
+  }
+
+  // Verbindung verloren: vor dem Spiel -> Fehler-Overlay; im Spiel -> die
+  // Spielseite zeigt über onClose den "getrennt"-Hinweis.
+  function handleConnLost(message: string) {
+    if (connected) {
+      if (onClose) onClose()
+      teardownConnection()
+    } else {
+      fail(message)
+    }
   }
 
   function wireChannel(channel: RTCDataChannel) {
     dc = channel
     dc.onopen = () => {
+      connected = true
       phase.value = 'playing'
       statusText.value = ''
-      stopTimer('signal') // Handshake fertig
+      if (connectTimeout) { clearTimeout(connectTimeout); connectTimeout = null }
+      // Signaling noch kurz weiterlaufen lassen, damit späte ICE-Kandidaten
+      // (Trickle) ankommen und die Verbindung sich festigt.
+      setTimeout(() => stopTimer('signal'), 3000)
     }
     dc.onmessage = (e) => {
       if (!onData) return
@@ -247,10 +287,13 @@ export function usePlayNetwork() {
 
   function teardownConnection() {
     stopTimer('heartbeat'); stopTimer('matchPoll'); stopTimer('signal')
+    if (connectTimeout) { clearTimeout(connectTimeout); connectTimeout = null }
+    if (disconnectGrace) { clearTimeout(disconnectGrace); disconnectGrace = null }
     try { dc?.close() } catch { /* egal */ }
     try { pc?.close() } catch { /* egal */ }
     dc = null
     pc = null
+    connected = false
     remoteReady = false
     pendingIce.length = 0
     seenSignals.clear()

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Users, CalendarDays, MapPin, ArrowRight, Clock, Trophy, ChevronDown } from '@lucide/vue'
+import { Users, CalendarDays, MapPin, ArrowRight, Clock, Trophy, ChevronDown, Snowflake } from '@lucide/vue'
 
 const config = useRuntimeConfig()
 const joinUrl = computed(() => config.public.joinFormUrl || '#mitglied-werden')
@@ -269,6 +269,46 @@ const faqs = [
           </div>
         </details>
       </div>
+    </SiteSection>
+    
+    <!-- Wintertraining beim Partner-Verein -->
+    <SiteSection>
+      <Card class="border-brand-sky/30 bg-brand-sky/5">
+        <CardContent class="flex flex-col items-center gap-8 p-6 sm:p-8 md:flex-row md:gap-10">
+          <div class="space-y-3 text-center md:text-left">
+            <p class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-brand-sky-dark">
+              <Snowflake class="size-4" /> Wintertraining
+            </p>
+            <h2 class="text-2xl sm:text-3xl">Im Winter weiterspielen</h2>
+            <p class="text-muted-foreground">
+              Bei uns in Offenhausen wird im Freien gespielt – ein eigenes Hallentraining
+              bieten wir nicht an. Wer in der kalten Jahreszeit am Ball bleiben will, ist
+              beim Partner-Verein <strong>UVB Grieskirchen</strong> bestens aufgehoben: Dort
+              kann in der Halle weitertrainiert werden. Einige unserer Mitglieder sind ohnehin
+              in beiden Vereinen aktiv – schau einfach vorbei, wenn du motiviert bist!
+            </p>
+            <div class="pt-1">
+              <Button as-child variant="secondary">
+                <a href="http://www.uvb-grieskirchen.at/" target="_blank" rel="noopener">
+                  Zum UVB Grieskirchen <ArrowRight class="size-4" />
+                </a>
+              </Button>
+            </div>
+          </div>
+          <a
+            href="http://www.uvb-grieskirchen.at/"
+            target="_blank"
+            rel="noopener"
+            class="flex w-full shrink-0 items-center justify-center rounded-xl bg-brand-navy px-6 py-7 shadow-sm transition-transform hover:scale-[1.02] md:w-64"
+          >
+            <img
+              src="/partner/uvb-grieskirchen.png"
+              alt="UVB Grieskirchen – Union Volleyball Grieskirchen"
+              class="h-auto w-full max-w-56 object-contain"
+            />
+          </a>
+        </CardContent>
+      </Card>
     </SiteSection>
 
     <!-- Social Media -->

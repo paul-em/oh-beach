@@ -1,13 +1,9 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Gamepad2, ChevronLeft, ChevronRight, ChevronUp } from '@lucide/vue'
 
 definePageMeta({ middleware: 'auth' })
 useSeoMeta({ title: 'Beach-Blobby' })
-
-const { user } = useUserSession()
 
 // ---- Virtuelle Spielwelt --------------------------------------------------
 // Physik & Maße sind dem Original "Blobby Volley 2" (Open Source) nachempfunden,
@@ -48,8 +44,6 @@ const winner = ref<0 | 1 | 2>(0)
 const score1 = ref(0)
 const score2 = ref(0)
 const serving = ref(false)
-const name1 = ref('')
-const name2 = ref('')
 
 // ---- Mobile: Vollbild im Querformat ---------------------------------------
 // Am Handy macht das Spiel nur quer & im Vollbild Sinn (zwei D-Pads
@@ -60,10 +54,6 @@ const isTouch = ref(false)
 const isPortrait = ref(false)
 const gameRoot = ref<HTMLElement | null>(null)
 const immersive = computed(() => isTouch.value && started.value)
-
-watchEffect(() => {
-  if (!name1.value) name1.value = (user.value?.name || 'Spieler 1').split(' ')[0] || 'Spieler 1'
-})
 
 // ---- Eingaben (bewusst NICHT reaktiv – wird pro Frame gelesen) -------------
 type Ctrl = 'left' | 'right' | 'jump'
@@ -465,9 +455,9 @@ onBeforeUnmount(() => {
         ? 'pointer-events-none absolute inset-x-0 top-2 z-20 flex items-center justify-center gap-3 font-display text-base text-white drop-shadow'
         : 'mb-3 flex items-center justify-center gap-4 font-display text-lg'"
     >
-      <span class="flex items-center gap-2"><span class="size-3 rounded-full bg-brand-coral" /> {{ name1 || 'Spieler 1' }}</span>
+      <span>Links</span>
       <span class="rounded-md bg-brand-navy px-3 py-1 font-bold text-white tabular-nums">{{ score1 }} : {{ score2 }}</span>
-      <span class="flex items-center gap-2">{{ name2 || 'Spieler 2' }} <span class="size-3 rounded-full bg-brand-navy" /></span>
+      <span>Rechts</span>
     </div>
 
     <!-- Vollbild verlassen -->
@@ -492,19 +482,9 @@ onBeforeUnmount(() => {
       <!-- Start-Overlay -->
       <div v-if="!started" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-brand-navy/70 px-6 text-center text-white backdrop-blur-sm">
         <h2 class="font-display text-2xl font-bold">Bereit zum Match?</h2>
-        <div class="flex w-full max-w-md flex-col gap-3 sm:flex-row">
-          <div class="flex-1 space-y-1 text-left">
-            <Label class="text-white/80">Spieler 1 (links)</Label>
-            <Input v-model="name1" class="border-white/30 bg-white/10 text-white placeholder:text-white/50" placeholder="Name" />
-          </div>
-          <div class="flex-1 space-y-1 text-left">
-            <Label class="text-white/80">Spieler 2 (rechts)</Label>
-            <Input v-model="name2" class="border-white/30 bg-white/10 text-white placeholder:text-white/50" placeholder="Name" />
-          </div>
-        </div>
-        <Button size="lg" class="mt-1" @click="startMatch">Spiel starten</Button>
+        <Button size="lg" @click="startMatch">Spiel starten</Button>
         <p class="max-w-md text-xs text-white/70">
-          Tastatur: Spieler 1 = A / D bewegen, W springen · Spieler 2 = ◀ / ▶ bewegen, ▲ springen.
+          Tastatur: links = A / D bewegen, W springen · rechts = ◀ / ▶ bewegen, ▲ springen.
           Am Handy startet das Spiel quer im Vollbild – die D-Pads in den unteren Ecken steuern je eine Seite.
         </p>
       </div>
@@ -512,7 +492,7 @@ onBeforeUnmount(() => {
       <!-- Sieg-Overlay -->
       <div v-else-if="winner" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-brand-navy/75 px-6 text-center text-white backdrop-blur-sm">
         <span class="text-4xl">🏐🎉</span>
-        <h2 class="font-display text-3xl font-bold">{{ winner === 1 ? (name1 || 'Spieler 1') : (name2 || 'Spieler 2') }} gewinnt!</h2>
+        <h2 class="font-display text-3xl font-bold">{{ winner === 1 ? 'Links' : 'Rechts' }} gewinnt!</h2>
         <p class="text-white/80">Endstand {{ score1 }} : {{ score2 }}</p>
         <Button size="lg" class="mt-1" @click="startMatch">Revanche</Button>
       </div>
@@ -532,8 +512,8 @@ onBeforeUnmount(() => {
     >
       <div
         v-for="pad in ([
-          { player: 'p1', label: name1 || 'Spieler 1', color: 'text-brand-coral' },
-          { player: 'p2', label: name2 || 'Spieler 2', color: 'text-brand-navy' },
+          { player: 'p1', label: 'Links', color: 'text-brand-coral' },
+          { player: 'p2', label: 'Rechts', color: 'text-brand-navy' },
         ] as const)"
         :key="pad.player"
         :class="['flex flex-col items-center gap-1.5', immersive && 'pointer-events-auto']"

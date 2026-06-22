@@ -32,7 +32,6 @@ const BLOB_GRAV = (15.1 * 15.1) / 293.625 // GRAVITATION ≈ 0.777
 const BLOB_JUMP = -15.1 // BLOBBY_JUMP_ACCELERATION (nach oben)
 const BLOB_SPEED = 4.5 // BLOBBY_SPEED (horizontal)
 const SERVE_Y = 300.5 // STANDARD_BALL_HEIGHT
-const SERVE_FRAMES = 50
 const POINTS_TO_WIN = 7
 
 const P1_START = 200
@@ -92,7 +91,6 @@ interface Ball { x: number; y: number; px: number; vx: number; vy: number; angle
 const p1: Blob = { x: P1_START, y: REST_Y, vy: 0, onGround: true }
 const p2: Blob = { x: P2_START, y: REST_Y, vy: 0, onGround: true }
 const ball: Ball = { x: P1_START, y: SERVE_Y, px: P1_START, vx: 0, vy: 0, angle: 0 }
-let serveTimer = 0
 
 let canvasRef = ref<HTMLCanvasElement | null>(null)
 let ctx: CanvasRenderingContext2D | null = null
@@ -120,7 +118,6 @@ function resetServe(serverSide: 1 | 2) {
   ball.px = ball.x
   ball.y = SERVE_Y
   ball.vx = 0; ball.vy = 0
-  serveTimer = SERVE_FRAMES
   serving.value = true
 }
 
@@ -263,9 +260,13 @@ function step() {
   updateBlob(p1, input.p1, LOWER_R, NET_X - NET_R - LOWER_R)
   updateBlob(p2, input.p2, NET_X + NET_R + LOWER_R, VW - LOWER_R)
 
-  if (serveTimer > 0) {
-    serveTimer--
-    if (serveTimer === 0) serving.value = false // Ball fällt dann mit der Schwerkraft
+  if (serving.value) {
+    // Beim Aufschlag schwebt der Ball über dem Aufschläger und fällt NICHT von
+    // selbst – er bleibt liegen, bis ihn ein Blob berührt. Erst diese Berührung
+    // setzt ihn (über den festen Abprall-Impuls) in Bewegung und startet den Ballwechsel.
+    collideBlob(p1)
+    collideBlob(p2)
+    if (ball.vx !== 0 || ball.vy !== 0) serving.value = false
   } else {
     updateBall()
   }
@@ -499,7 +500,7 @@ onBeforeUnmount(() => {
 
       <!-- Aufschlag-Hinweis -->
       <div v-else-if="serving" class="pointer-events-none absolute inset-x-0 top-3 flex justify-center">
-        <span class="rounded-full bg-white/85 px-3 py-1 text-sm font-semibold text-brand-navy shadow">Aufschlag …</span>
+        <span class="rounded-full bg-white/85 px-3 py-1 text-sm font-semibold text-brand-navy shadow">Aufschlag – berühre den Ball</span>
       </div>
     </div>
 

@@ -172,9 +172,11 @@ function chooseOnline() {
   net.startLobby()
 }
 async function openGame() {
+  enterImmersive() // aus der Tap-Geste heraus – sonst blockt der Browser Vollbild
   try { await net.host() } catch { /* z. B. Netzwerkfehler – Lobby bleibt offen */ }
 }
 async function joinOpen(id: string) {
+  enterImmersive() // aus der Tap-Geste heraus
   try { await net.join(id) } catch { await net.refreshLobby() }
 }
 function cancelConnecting() {
@@ -191,6 +193,7 @@ function backToMenu() {
   resetIdle()
 }
 function backToLobby() {
+  exitImmersive()
   netDisconnected.value = false
   started.value = false
   winner.value = 0
@@ -208,16 +211,32 @@ function rematch() {
   }
 }
 
-// Echtes Vollbild + Querformat-Lock (best effort). Muss aus einer User-Geste kommen.
-async function enterImmersive() {
-  const el = gameRoot.value
-  try {
-    if (el && !document.fullscreenElement && el.requestFullscreen) await el.requestFullscreen()
-  } catch { /* vom Browser/Gerät nicht erlaubt */ }
+// Querformat-Sperre (best effort; iOS unterstützt sie nicht). Wird sowohl direkt
+// als auch nach dem Wechsel in den Vollbildmodus versucht.
+function lockLandscape() {
   try {
     const orientation = screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }
-    await orientation?.lock?.('landscape')
-  } catch { /* Lock nicht unterstützt (z. B. iOS) */ }
+    const p = orientation?.lock?.('landscape')
+    if (p && typeof p.catch === 'function') p.catch(() => {})
+  } catch { /* Lock nicht unterstützt */ }
+}
+
+// Echtes Vollbild + Querformat-Lock (best effort). MUSS synchron aus einer
+// User-Geste heraus aufgerufen werden – sonst lehnt der Browser requestFullscreen
+// ab. Deshalb wird hier NICHT awaited (das würde die Geste "verbrauchen").
+function enterImmersive() {
+  if (!isTouch.value) return
+  const el = gameRoot.value
+  try {
+    if (el && !document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(() => {})
+  } catch { /* vom Browser/Gerät nicht erlaubt – CSS-Vollbild greift trotzdem */ }
+  lockLandscape()
+}
+
+// Querformat erst sperren, wenn der Vollbildmodus tatsächlich aktiv ist
+// (viele Browser erlauben den Lock nur dann).
+function onFullscreenChange() {
+  if (document.fullscreenElement) lockLandscape()
 }
 function exitImmersive() {
   try { (screen.orientation as ScreenOrientation & { unlock?: () => void })?.unlock?.() } catch { /* egal */ }
@@ -562,7 +581,9 @@ watch(netPhase, (p) => {
   lastSnap = null; lastSnapSeq = -1; snapSeq = 0
   input.p1.left = input.p1.right = input.p1.jump = false
   input.p2.left = input.p2.right = input.p2.jump = false
-  if (isTouch.value) enterImmersive()
+  // Vollbild wurde bereits aus der Tap-Geste (openGame/joinOpen) angefordert;
+  // hier nur noch sicherstellen, dass im Querformat gesperrt ist.
+  if (isTouch.value) lockLandscape()
   if (netRole.value === 'host') beginMatch()
   else { started.value = true; winner.value = 0; score1.value = 0; score2.value = 0 }
 })
@@ -577,6 +598,7 @@ onMounted(() => {
   isTouch.value = window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window
   updateOrientation()
   portraitMq?.addEventListener('change', updateOrientation)
+  document.addEventListener('fullscreenchange', onFullscreenChange)
   window.addEventListener('keydown', keydown)
   window.addEventListener('keyup', keyup)
   raf = requestAnimationFrame(frame)
@@ -587,6 +609,7 @@ onBeforeUnmount(() => {
   exitImmersive()
   net.dispose()
   portraitMq?.removeEventListener('change', updateOrientation)
+  document.removeEventListener('fullscreenchange', onFullscreenChange)
   window.removeEventListener('keydown', keydown)
   window.removeEventListener('keyup', keyup)
 })

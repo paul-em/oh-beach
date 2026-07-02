@@ -6,6 +6,7 @@ import {
   Utensils, Smile, ArrowRight, Phone, ExternalLink,
 } from '@lucide/vue'
 
+const REGISTER_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScCBBnTYo5VE1z4KkY4G66p09qVEmnp3eFbHWSU1XS90FFNyg/viewform'
 const CONTACT_PHONE = '0699/19961402'
 const CONTACT_NAME = 'Verena Seiler'
 
@@ -62,7 +63,7 @@ const highlights = [
           </p>
           <div class="flex flex-wrap gap-3">
             <Button as-child size="lg">
-              <a :href="`tel:${CONTACT_PHONE.replace(/[^0-9+]/g, '')}`">
+              <a :href="REGISTER_URL" target="_blank" rel="noopener">
                 Jetzt anmelden <ArrowRight class="size-4" />
               </a>
             </Button>
@@ -161,13 +162,13 @@ const highlights = [
           <div class="max-w-xl space-y-2">
             <h2 class="text-3xl">Anmeldung</h2>
             <p class="text-muted-foreground">
-              Die Teilnahme ist kostenlos. Melde dich einfach bis <strong>27. Juli 2026</strong>
-              telefonisch bei {{ CONTACT_NAME }} an – wir freuen uns auf dich!
+              Die Anmeldung läuft ausschließlich über unser Online-Formular. Melde dich
+              einfach bis <strong>27. Juli 2026</strong> an – wir freuen uns auf dich!
             </p>
           </div>
           <Button as-child size="lg" class="shrink-0">
-            <a :href="`tel:${CONTACT_PHONE.replace(/[^0-9+]/g, '')}`">
-              <Phone class="size-4" /> {{ CONTACT_PHONE }}
+            <a :href="REGISTER_URL" target="_blank" rel="noopener">
+              Zum Anmeldeformular <ArrowRight class="size-4" />
             </a>
           </Button>
         </CardContent>
@@ -179,7 +180,10 @@ const highlights = [
           class="flex items-center gap-3 rounded-xl border border-border/60 bg-background p-5 transition-colors hover:border-brand-coral"
         >
           <Phone class="size-5 text-brand-coral" />
-          <span class="font-semibold">{{ CONTACT_NAME }} · {{ CONTACT_PHONE }}</span>
+          <span>
+            <span class="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Fragen?</span>
+            <span class="font-semibold">{{ CONTACT_NAME }} · {{ CONTACT_PHONE }}</span>
+          </span>
         </a>
       </div>
     </SiteSection>

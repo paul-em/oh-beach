@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   CalendarDays, Clock, MapPin, Users, Sun, Sparkles, Volleyball,
-  Utensils, Smile, ArrowRight, Phone, ExternalLink,
+  Utensils, Smile, ArrowRight, Phone, ExternalLink, Info,
 } from '@lucide/vue'
 
 const REGISTER_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScCBBnTYo5VE1z4KkY4G66p09qVEmnp3eFbHWSU1XS90FFNyg/viewform'
@@ -13,12 +13,12 @@ const CONTACT_NAME = 'Verena Seiler'
 useSeoMeta({
   title: 'Ferienspielaktion 2026',
   description:
-    'Beachvolleyball-Ferienspielaktion des O.H.BEACH Offenhausen am 31. Juli 2026 von 10 bis 16 Uhr. Sport, Spaß und Sommerfeeling im Sand – ab 7 Jahren, inkl. Verpflegung. Jetzt anmelden!',
+    'Beachvolleyball-Ferienspielaktion des O.H.BEACH Offenhausen am 31. Juli 2026 von 10 bis 14 Uhr. Sport, Spaß und Sommerfeeling im Sand – ab 7 Jahren, inkl. Verpflegung. Jetzt anmelden!',
 })
 
 const facts = [
   { icon: CalendarDays, label: 'Wann', value: 'Freitag, 31. Juli 2026' },
-  { icon: Clock, label: 'Uhrzeit', value: '10:00 – 16:00 Uhr' },
+  { icon: Clock, label: 'Uhrzeit', value: '10:00 – 14:00 Uhr' },
   { icon: MapPin, label: 'Wo', value: 'Beachvolleyballplatz Offenhausen' },
   { icon: Users, label: 'Wer', value: 'Kinder ab 7 Jahren' },
   { icon: Utensils, label: 'Verpflegung', value: 'inkl. Mittagssnack & Getränke' },
@@ -77,6 +77,16 @@ const highlights = [
 
     <!-- Eckdaten -->
     <SiteSection id="infos">
+      <!-- Hinweis: geänderte Uhrzeit -->
+      <div class="mb-8 flex items-start gap-3 rounded-xl border border-brand-coral/30 bg-brand-coral/10 p-4 text-sm">
+        <Info class="mt-0.5 size-5 shrink-0 text-brand-coral" />
+        <p>
+          <span class="font-semibold">Achtung, geänderte Uhrzeit:</span>
+          Die Ferienspielaktion endet nun bereits um <strong>14:00 Uhr</strong>
+          (statt wie ursprünglich angekündigt um 16:00 Uhr). Los geht's weiterhin um 10:00 Uhr.
+        </p>
+      </div>
+
       <div class="mb-10 max-w-2xl">
         <h2 class="text-3xl">Die Eckdaten</h2>
         <p class="mt-3 text-muted-foreground">Das Wichtigste auf einen Blick.</p>
@@ -124,7 +134,7 @@ const highlights = [
           </p>
           <h2 class="text-3xl">So läuft's ab</h2>
           <p class="text-white/80">
-            Von 10 bis 16 Uhr dreht sich alles um Beachvolleyball: Wir starten mit
+            Von 10 bis 14 Uhr dreht sich alles um Beachvolleyball: Wir starten mit
             spielerischen Übungen, sammeln erste Tipps und Tricks und spielen gemeinsam
             im Sand. Egal ob du noch nie am Beachplatz gestanden bist oder schon Erfahrung
             hast – bei uns findet jede:r den passenden Platz.

@@ -6,6 +6,9 @@ import {
   Utensils, Smile, ArrowRight, Phone, ExternalLink, Info, Heart,
 } from '@lucide/vue'
 
+// Öffentliches Asset (public/) – als Binding, damit ein noch fehlendes Foto den Build nicht bricht
+const DANKE_IMG = '/ferienspiel-2026-danke.jpg'
+
 const REGISTER_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScCBBnTYo5VE1z4KkY4G66p09qVEmnp3eFbHWSU1XS90FFNyg/viewform'
 const CONTACT_PHONE = '0699/19961402'
 const CONTACT_NAME = 'Verena Seiler'
@@ -90,7 +93,7 @@ const highlights = [
           </p>
         </div>
         <img
-          src="/ferienspiel-2026-danke.jpg"
+          :src="DANKE_IMG"
           alt="Gruppenfoto der Kinder bei der Ferienspielaktion 2026 am Beachvolleyballplatz Offenhausen"
           class="w-full rounded-xl border border-border/60 object-cover shadow-sm"
           loading="lazy"

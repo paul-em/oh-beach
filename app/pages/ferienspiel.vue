@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   CalendarDays, Clock, MapPin, Users, Sun, Sparkles, Volleyball,
-  Utensils, Smile, ArrowRight, Phone, ExternalLink, Info,
+  Utensils, Smile, ArrowRight, Phone, ExternalLink, Info, Heart,
 } from '@lucide/vue'
 
 const REGISTER_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScCBBnTYo5VE1z4KkY4G66p09qVEmnp3eFbHWSU1XS90FFNyg/viewform'
@@ -74,6 +74,29 @@ const highlights = [
         </div>
       </div>
     </section>
+
+    <!-- DANKE fürs Mitmachen -->
+    <SiteSection>
+      <div class="grid items-center gap-10 md:grid-cols-2">
+        <div class="space-y-4">
+          <p class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-brand-coral">
+            <Heart class="size-4" /> Rückblick
+          </p>
+          <h2 class="text-3xl sm:text-4xl">DANKE fürs Mitmachen!</h2>
+          <p class="text-lg text-muted-foreground">
+            14 Kinder waren bei unserer Ferienspielaktion dabei und haben mit
+            jeder Menge Einsatz, Spaß und guter Laune den Sand zum Beben gebracht.
+            Wir sagen DANKE – es war ein richtig toller Tag mit euch!
+          </p>
+        </div>
+        <img
+          src="/ferienspiel-2026-danke.jpg"
+          alt="Gruppenfoto der Kinder bei der Ferienspielaktion 2026 am Beachvolleyballplatz Offenhausen"
+          class="w-full rounded-xl border border-border/60 object-cover shadow-sm"
+          loading="lazy"
+        />
+      </div>
+    </SiteSection>
 
     <!-- Eckdaten -->
     <SiteSection id="infos">

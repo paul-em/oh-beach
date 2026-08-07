@@ -3,8 +3,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   CalendarDays, Clock, MapPin, Users, Sun, Sparkles, Volleyball,
-  Utensils, Smile, ArrowRight, Phone, ExternalLink, Info,
+  Utensils, Smile, ArrowRight, Phone, ExternalLink, Info, Heart,
 } from '@lucide/vue'
+
+// Öffentliches Asset (public/) – als Binding, damit ein noch fehlendes Foto den Build nicht bricht
+const DANKE_IMG = '/ferienspiel-2026-danke.jpg'
 
 const REGISTER_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScCBBnTYo5VE1z4KkY4G66p09qVEmnp3eFbHWSU1XS90FFNyg/viewform'
 const CONTACT_PHONE = '0699/19961402'
@@ -74,6 +77,35 @@ const highlights = [
         </div>
       </div>
     </section>
+
+    <!-- DANKE fürs Mitmachen -->
+    <SiteSection>
+      <div class="grid items-center gap-10 md:grid-cols-2">
+        <div class="space-y-4">
+          <p class="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-brand-coral">
+            <Heart class="size-4" /> Rückblick
+          </p>
+          <h2 class="text-3xl sm:text-4xl">DANKE fürs Mitmachen!</h2>
+          <p class="text-lg text-muted-foreground">
+            14 Kinder waren bei unserer Ferienspielaktion dabei – und das bei bis zu
+            37 Grad! Trotz der Hitze waren alle top motiviert und mit jeder Menge
+            Einsatz, Spaß und guter Laune im Sand unterwegs.
+          </p>
+          <p class="text-lg text-muted-foreground">
+            Damit die Füße es aushalten, haben wir den Sand mit dem Wasserschlauch
+            immer schön nass gehalten – und zur Abkühlung sind die Kids einfach durch
+            den Rasensprenger gelaufen. Wir sagen DANKE – es war ein richtig toller
+            Tag mit euch!
+          </p>
+        </div>
+        <img
+          :src="DANKE_IMG"
+          alt="Gruppenfoto der Kinder bei der Ferienspielaktion 2026 am Beachvolleyballplatz Offenhausen"
+          class="w-full rounded-xl border border-border/60 object-cover shadow-sm"
+          loading="lazy"
+        />
+      </div>
+    </SiteSection>
 
     <!-- Eckdaten -->
     <SiteSection id="infos">

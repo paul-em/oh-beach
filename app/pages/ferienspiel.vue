@@ -87,9 +87,15 @@ const highlights = [
           </p>
           <h2 class="text-3xl sm:text-4xl">DANKE fürs Mitmachen!</h2>
           <p class="text-lg text-muted-foreground">
-            14 Kinder waren bei unserer Ferienspielaktion dabei und haben mit
-            jeder Menge Einsatz, Spaß und guter Laune den Sand zum Beben gebracht.
-            Wir sagen DANKE – es war ein richtig toller Tag mit euch!
+            14 Kinder waren bei unserer Ferienspielaktion dabei – und das bei über
+            30 Grad! Trotz der Hitze waren alle top motiviert und mit jeder Menge
+            Einsatz, Spaß und guter Laune im Sand unterwegs.
+          </p>
+          <p class="text-lg text-muted-foreground">
+            Damit die Füße es aushalten, haben wir den Sand mit dem Wasserschlauch
+            immer schön nass gehalten – und zur Abkühlung sind die Kids einfach durch
+            den Rasensprenger gelaufen. Wir sagen DANKE – es war ein richtig toller
+            Tag mit euch!
           </p>
         </div>
         <img

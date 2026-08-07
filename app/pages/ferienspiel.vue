@@ -87,8 +87,8 @@ const highlights = [
           </p>
           <h2 class="text-3xl sm:text-4xl">DANKE fürs Mitmachen!</h2>
           <p class="text-lg text-muted-foreground">
-            14 Kinder waren bei unserer Ferienspielaktion dabei – und das bei über
-            30 Grad! Trotz der Hitze waren alle top motiviert und mit jeder Menge
+            14 Kinder waren bei unserer Ferienspielaktion dabei – und das bei bis zu
+            37 Grad! Trotz der Hitze waren alle top motiviert und mit jeder Menge
             Einsatz, Spaß und guter Laune im Sand unterwegs.
           </p>
           <p class="text-lg text-muted-foreground">

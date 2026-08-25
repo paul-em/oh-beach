@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   CalendarDays, MapPin, Trophy, Users, Beer, Utensils,
-  ArrowRight, ExternalLink, Mail, Images, Heart,
+  ArrowRight, ExternalLink, Mail, Images, Heart, Medal,
 } from '@lucide/vue'
 
 const PHOTOS_URL = 'https://drive.google.com/drive/folders/17F8e5CBY35YhVqJEYPVaywTEGWsMyHCz'
@@ -14,9 +14,9 @@ const mainPartner = partners.find(p => p.featured)
 const otherPartners = partners.filter(p => !p.featured)
 
 useSeoMeta({
-  title: 'SilberHolz Beach Open 2026 – Danke & Fotos',
+  title: 'SilberHolz Beach Open 2026 – Danke, Ergebnisse & Fotos',
   description:
-    'Die SilberHolz Beach Open 2026 in Offenhausen sind vorbei. Danke an alle Teams, Helfer:innen und Partner – hier gibt es die Fotos vom Turniertag.',
+    'Die SilberHolz Beach Open 2026 in Offenhausen sind vorbei. Danke an alle Teams, Helfer:innen und Partner – hier gibt es Ergebnisse und Fotos vom Turniertag.',
 })
 
 const facts = [
@@ -26,11 +26,41 @@ const facts = [
   { icon: Trophy, label: 'Raster', value: 'Pool Play → Double KO' },
 ]
 
+// Endstand vom Turniertag – Platz 1 zuerst
+const rankings = [
+  {
+    icon: Trophy,
+    title: 'Beachvolleyball',
+    subtitle: 'Das Podium im Turnier',
+    entries: [
+      { place: 1, team: 'Leberkasvereinigung' },
+      { place: 2, team: 'Offenhausner Beckenrandlegenden' },
+      { place: 3, team: 'Em Bäm & Co KG' },
+    ],
+  },
+  {
+    icon: Beer,
+    title: 'Seiterl-Wertung',
+    subtitle: 'Die durstigsten Teams',
+    entries: [
+      { place: 1, team: 'Bachforön', note: '104 Seiterl' },
+      { place: 2, team: 'Gegen wen eigentlich' },
+      { place: 3, team: 'Leberkasvereinigung' },
+    ],
+  },
+]
+
+const rankClasses: Record<number, string> = {
+  1: 'bg-brand-sun text-brand-navy',
+  2: 'bg-white/85 text-brand-navy',
+  3: 'bg-brand-coral text-white',
+}
+
 const highlights = [
   {
     icon: Beer,
     title: 'Seiterl-Wertung',
-    text: 'Unsere berühmte Seiterl-Wertung war auch heuer wieder heiß umkämpft – Prost an alle, die mitgehalten haben! 🍻',
+    text: 'Unsere berühmte Seiterl-Wertung war auch heuer wieder heiß umkämpft: 104 Seiterl hat es heuer zum Sieg gebraucht. Prost an alle, die mitgehalten haben! 🍻',
   },
   {
     icon: Utensils,
@@ -70,7 +100,7 @@ const highlights = [
               </a>
             </Button>
             <Button as-child size="lg" variant="outline">
-              <a href="#rueckblick">Rückblick</a>
+              <a href="#ergebnisse">Ergebnisse</a>
             </Button>
           </div>
         </div>
@@ -100,6 +130,52 @@ const highlights = [
           </Button>
         </CardContent>
       </Card>
+    </SiteSection>
+
+    <!-- Ergebnisse -->
+    <SiteSection id="ergebnisse" tone="navy">
+      <div class="mb-10 max-w-2xl">
+        <h2 class="flex items-start gap-2 text-3xl">
+          <Medal class="mt-1 size-7 shrink-0 text-brand-sun" /> Die Ergebnisse
+        </h2>
+        <p class="mt-3 text-white/80">
+          Gratulation an die Podiumsplätze – in beiden Wertungen!
+        </p>
+      </div>
+      <div class="grid gap-6 md:grid-cols-2">
+        <div
+          v-for="r in rankings"
+          :key="r.title"
+          class="rounded-xl border border-white/15 bg-white/5 p-6"
+        >
+          <h3 class="flex items-center gap-2 text-xl">
+            <component :is="r.icon" class="size-5 text-brand-sky" /> {{ r.title }}
+          </h3>
+          <p class="mt-1 text-sm text-white/60">{{ r.subtitle }}</p>
+          <ol class="mt-5 space-y-3">
+            <li
+              v-for="e in r.entries"
+              :key="e.place"
+              class="flex items-center gap-4 rounded-lg bg-white/5 px-4 py-3"
+              :class="e.place === 1 ? 'ring-1 ring-brand-sun/60' : ''"
+            >
+              <span
+                class="flex size-9 shrink-0 items-center justify-center rounded-full font-semibold"
+                :class="rankClasses[e.place]"
+              >
+                {{ e.place }}
+              </span>
+              <span class="min-w-0">
+                <span
+                  class="block font-semibold"
+                  :class="e.place === 1 ? 'text-lg text-brand-sun' : 'text-white'"
+                >{{ e.team }}</span>
+                <span v-if="e.note" class="block text-sm text-white/60">{{ e.note }}</span>
+              </span>
+            </li>
+          </ol>
+        </div>
+      </div>
     </SiteSection>
 
     <!-- Rückblick: Eckdaten -->

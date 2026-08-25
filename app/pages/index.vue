@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Users, CalendarDays, MapPin, ArrowRight, Clock, Trophy, ChevronDown, Snowflake } from '@lucide/vue'
+import { Users, CalendarDays, MapPin, ArrowRight, Clock, ChevronDown, Snowflake, Images } from '@lucide/vue'
 
 const config = useRuntimeConfig()
 const joinUrl = computed(() => config.public.joinFormUrl || '#mitglied-werden')
@@ -36,13 +36,13 @@ const faqs = [
   <div>
     <!-- Turnier-Hinweis -->
     <NuxtLink
-      to="/turnier"
+      to="/turnier#fotos"
       class="group block bg-brand-sky transition-colors hover:bg-brand-sky-dark"
     >
       <div class="mx-auto flex w-full max-w-6xl items-center justify-center gap-2 px-4 py-2.5 text-center text-sm text-white">
-        <Trophy class="size-4 shrink-0" />
-        <span class="font-semibold">SilberHolz Beach Open am 22. August</span>
-        <span class="hidden opacity-80 sm:inline">– jetzt Team anmelden</span>
+        <Images class="size-4 shrink-0" />
+        <span class="font-semibold">Danke für die SilberHolz Beach Open 2026!</span>
+        <span class="hidden opacity-80 sm:inline">– hier gibt es die Fotos</span>
         <ArrowRight class="size-4 shrink-0 transition-transform group-hover:translate-x-1" />
       </div>
     </NuxtLink>

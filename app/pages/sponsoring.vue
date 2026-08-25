@@ -9,7 +9,7 @@ import {
 useSeoMeta({
   title: 'Sponsoring & Partner',
   description:
-    'Werde Partner von O.H.BEACH! Unsere Sponsorpakete für die Beach Open Offenhausen – von Turniername-Sponsor bis Vereins-Supporter. Jetzt Sponsormappe herunterladen.',
+    'Werde Partner von O.H.BEACH! Unsere Sponsorpakete für das Beach Open Offenhausen – von Turniername-Sponsor bis Vereins-Supporter. Jetzt Sponsormappe herunterladen.',
 })
 
 const PDF_URL = '/Sponsormappe-OHBeach.pdf'
@@ -153,7 +153,7 @@ const vision = [
           </h1>
           <p class="mt-6 max-w-md text-lg text-white/85">
             Bringen Sie Ihre Marke aufs Spielfeld: Mit Ihrer Unterstützung machen Sie
-            die Beach Open Offenhausen und unseren Verein möglich – und sind das ganze
+            das Beach Open Offenhausen und unseren Verein möglich – und sind das ganze
             Jahr über sichtbar dabei.
           </p>
           <div class="mt-8 flex flex-wrap gap-3">

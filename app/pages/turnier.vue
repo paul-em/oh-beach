@@ -16,7 +16,7 @@ const otherPartners = partners.filter(p => !p.featured)
 useSeoMeta({
   title: 'SilberHolz Beach Open 2026 – Danke, Ergebnisse & Fotos',
   description:
-    'Die SilberHolz Beach Open 2026 in Offenhausen sind vorbei. Danke an alle Teams, Helfer:innen und Partner – hier gibt es Ergebnisse und Fotos vom Turniertag.',
+    'Das SilberHolz Beach Open 2026 in Offenhausen ist vorbei. Danke an alle Teams, Helfer:innen und Partner – hier gibt es Ergebnisse und Fotos vom Turniertag.',
 })
 
 const facts = [
@@ -85,13 +85,13 @@ const highlights = [
             Rückblick · Turnier vom 22. August 2026
           </p>
           <h1 class="text-5xl sm:text-6xl lg:text-7xl">
-            Danke für die<br /><span class="text-brand-coral">Beach Open 2026!</span>
+            Danke für das<br /><span class="text-brand-coral">Beach Open 2026!</span>
           </h1>
           <p class="max-w-md text-lg text-muted-foreground">
             Ein Turniertag mit Beach, Rasen, Grillerei und bester Stimmung liegt hinter
             uns. Danke an alle Teams, die angereist sind, an alle Helfer:innen und an
-            unsere Partner – ihr habt die SilberHolz Beach Open zu dem gemacht, was sie
-            waren.
+            unsere Partner – ihr habt das SilberHolz Beach Open zu dem gemacht, was es
+            war.
           </p>
           <div class="flex flex-wrap gap-3">
             <Button as-child size="lg">
@@ -274,7 +274,7 @@ const highlights = [
         <a :href="mainPartner.url || undefined" target="_blank" rel="noopener" class="w-full max-w-2xl" :aria-label="`Zur Website von ${mainPartner.name}`">
           <img
             :src="mainPartner.logo"
-            :alt="`${mainPartner.name} – Hauptsponsor der Beach Open`"
+            :alt="`${mainPartner.name} – Hauptsponsor des Beach Open`"
             class="w-full shadow-md transition-transform hover:scale-[1.02]"
           />
         </a>

@@ -41,7 +41,7 @@ const faqs = [
     >
       <div class="mx-auto flex w-full max-w-6xl items-center justify-center gap-2 px-4 py-2.5 text-center text-sm text-white">
         <Images class="size-4 shrink-0" />
-        <span class="font-semibold">Danke für die SilberHolz Beach Open 2026!</span>
+        <span class="font-semibold">Danke für das SilberHolz Beach Open 2026!</span>
         <span class="hidden opacity-80 sm:inline">– hier gibt es die Fotos</span>
         <ArrowRight class="size-4 shrink-0 transition-transform group-hover:translate-x-1" />
       </div>

@@ -19,6 +19,7 @@ Mitglieder liegen in einem Google Sheet, Reservierungen in einem Google Calendar
 - Öffentliche Platzbelegung (`/kalender`) – frei/belegt ohne Namensnennung
 - Mitglieder-Login, Passwort-Setzen/-Reset per E-Mail-Link
 - Platzreservierung in festen Stundenslots (08–22 Uhr, 14 Tage Vorlauf) inkl. Storno
+- Vereinstermine (`/mitglieder/termine`) – vom Vorstand in einem eigenen Google Calendar gepflegt, nur für Mitglieder sichtbar
 - Design-System „Sunny Beach" + Styleguide unter `/styleguide`
 - Beach-Blobby (`/mitglieder/spiel`) – Mini-Volleyball, lokal zu zweit **oder online** gegen andere Mitglieder (WebRTC P2P)
 
@@ -63,6 +64,7 @@ NUXT_PUBLIC_SITE_URL=http://localhost:3000
 | `NUXT_GOOGLE_PRIVATE_KEY` | Service-Account-Private-Key (`\n` escaped) |
 | `NUXT_GOOGLE_SHEET_ID` | ID des Mitglieder-Sheets |
 | `NUXT_GOOGLE_CALENDAR_ID` | ID des Platzbelegungs-Kalenders |
+| `NUXT_GOOGLE_EVENTS_CALENDAR_ID` | ID des Vereinstermine-Kalenders (nur lesend, Mitgliederbereich) |
 | `NUXT_RESEND_API_KEY` | Resend API-Key (E-Mail-Versand) |
 | `NUXT_EMAIL_FROM` | Absenderadresse (verifizierte Domain) |
 | `NUXT_PUBLIC_SITE_URL` | Öffentliche Basis-URL (Links in E-Mails) |

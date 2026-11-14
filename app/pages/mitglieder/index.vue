@@ -2,12 +2,18 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { CalendarPlus, CalendarDays, ListChecks, Dices, UserCog, Gamepad2 } from '@lucide/vue'
+import { CalendarPlus, CalendarDays, CalendarHeart, ListChecks, Dices, UserCog, Gamepad2 } from '@lucide/vue'
 
 definePageMeta({ middleware: 'auth' })
 useSeoMeta({ title: 'Mein Bereich' })
 
 const { user } = useUserSession()
+
+// Vorschau der nächsten Vereinstermine (lazy, damit die Seite nicht blockiert)
+const { data: upcoming, pending: eventsPending, error: eventsError } = useLazyFetch('/api/events', {
+  query: { limit: 3 },
+  default: () => ({ events: [] }),
+})
 </script>
 
 <template>
@@ -52,6 +58,28 @@ const { user } = useUserSession()
         </CardHeader>
         <CardContent>
           <Button as-child variant="secondary" class="w-full"><NuxtLink to="/mitglieder/meine-buchungen">Anzeigen</NuxtLink></Button>
+        </CardContent>
+      </Card>
+
+      <Card class="sm:col-span-2">
+        <CardHeader>
+          <div class="mb-2 flex size-12 items-center justify-center rounded-xl bg-brand-sky/15 text-brand-sky-dark">
+            <CalendarHeart class="size-6" />
+          </div>
+          <CardTitle>Nächste Termine</CardTitle>
+          <CardDescription>Sitzungen, Arbeitseinsätze und Feste im Verein.</CardDescription>
+        </CardHeader>
+        <CardContent class="space-y-4">
+          <p v-if="eventsPending" class="text-sm text-muted-foreground">Lädt …</p>
+          <p v-else-if="eventsError" class="text-sm text-muted-foreground">Termine konnten gerade nicht geladen werden.</p>
+          <p v-else-if="!upcoming.events.length" class="text-sm text-muted-foreground">Aktuell sind keine Termine eingetragen.</p>
+          <ul v-else class="divide-y divide-border">
+            <li v-for="ev in upcoming.events" :key="ev.id" class="flex flex-col py-2 first:pt-0 last:pb-0">
+              <span class="font-semibold">{{ ev.title }}</span>
+              <span class="text-sm text-muted-foreground">{{ formatEventWhen(ev) }}<template v-if="ev.location"> · {{ ev.location }}</template></span>
+            </li>
+          </ul>
+          <Button as-child variant="secondary" class="w-full"><NuxtLink to="/mitglieder/termine">Alle Termine</NuxtLink></Button>
         </CardContent>
       </Card>
 

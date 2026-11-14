@@ -79,6 +79,23 @@ Danach:
 
 ---
 
+## 3b. Vereinstermine-Kalender (Mitgliederbereich)
+
+Interner Event-/Terminkalender, getrennt vom Platzbelegungs-Kalender. Der Vorstand
+trägt Termine **direkt in Google Calendar** ein; Mitglieder sehen sie unter
+`/mitglieder/termine` (und die nächsten drei auf der Startseite des Mitgliederbereichs).
+Termine sperren den Sandplatz **nicht**.
+
+1. Eigenen Kalender anlegen (z. B. „O.H.BEACH Termine").
+2. Unter **Einstellungen → Für bestimmte Personen freigeben** den Service-Account
+   hinzufügen – **„Alle Termindetails sehen"** reicht (die App liest nur).
+   Vorstandsmitglieder, die Termine pflegen, mit **„Änderungen an Terminen vornehmen"** freigeben.
+3. **Kalender-ID** kopieren → `NUXT_GOOGLE_EVENTS_CALENDAR_ID`.
+
+Angezeigt werden Titel, Zeit, Ort und Beschreibung; Serientermine werden einzeln aufgelöst.
+
+---
+
 ## 4. Resend (E-Mail)
 
 1. Account auf [resend.com](https://resend.com) anlegen.
@@ -106,6 +123,7 @@ Danach:
 - [ ] Service-Account-Key als Env-Variablen hinterlegt
 - [ ] Sheet `Mitglieder` mit Kopfzeile, mit Service-Account geteilt (Bearbeiter)
 - [ ] Kalender angelegt, mit Service-Account geteilt (Änderungen erlaubt)
+- [ ] Termine-Kalender mit Service-Account geteilt (Details sehen), ID in `NUXT_GOOGLE_EVENTS_CALENDAR_ID`
 - [ ] Resend-Domain verifiziert, API-Key + Absender gesetzt
 - [ ] Alle `NUXT_*`-Variablen in Vercel hinterlegt
 - [ ] Test: Mitglied im Sheet (`active`=ja) → „Passwort setzen" → Login → Reservieren

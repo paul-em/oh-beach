@@ -60,6 +60,40 @@ export function formatTime(iso: string): string {
   }).format(new Date(iso))
 }
 
+function formatDayShort(d: Date, timeZone: string): string {
+  return new Intl.DateTimeFormat('de-AT', { weekday: 'short', day: 'numeric', month: 'long', timeZone }).format(d)
+}
+
+/**
+ * Zeitangabe für einen Vereinstermin, z. B.
+ * "Sa, 20. Juni · 18:00 – 22:00", "Sa, 20. Juni · ganztägig",
+ * "Sa, 20. Juni – So, 21. Juni" oder "Sa, 20. Juni 18:00 – So, 21. Juni 12:00".
+ * Ganztägige Termine: start/end als YYYY-MM-DD, end exklusiv (wie bei Google).
+ */
+export function formatEventWhen(ev: { start: string; end: string; allDay: boolean }): string {
+  if (ev.allDay) {
+    const lastDay = addDays(ev.end, -1)
+    const first = formatDayShort(new Date(`${ev.start}T12:00:00Z`), 'UTC')
+    if (lastDay <= ev.start) return `${first} · ganztägig`
+    return `${first} – ${formatDayShort(new Date(`${lastDay}T12:00:00Z`), 'UTC')}`
+  }
+  const s = new Date(ev.start)
+  const e = new Date(ev.end)
+  const sameDay = formatDayShort(s, TZ) === formatDayShort(e, TZ)
+  if (sameDay) return `${formatDayShort(s, TZ)} · ${formatTime(ev.start)} – ${formatTime(ev.end)}`
+  return `${formatDayShort(s, TZ)} ${formatTime(ev.start)} – ${formatDayShort(e, TZ)} ${formatTime(ev.end)}`
+}
+
+/** Monatskürzel + Tag für ein Kalenderblatt-Badge, z. B. { month: "Juni", day: "20" }. */
+export function eventDateBadge(ev: { start: string; allDay: boolean }): { month: string; day: string } {
+  const d = ev.allDay ? new Date(`${ev.start}T12:00:00Z`) : new Date(ev.start)
+  const timeZone = ev.allDay ? 'UTC' : TZ
+  return {
+    month: new Intl.DateTimeFormat('de-AT', { month: 'short', timeZone }).format(d).replace(/\.$/, ''),
+    day: new Intl.DateTimeFormat('de-AT', { day: 'numeric', timeZone }).format(d),
+  }
+}
+
 /** "Fr, 20. Juni · 18:00 – 19:00" für eine Buchung. */
 export function formatBookingWhen(startISO: string, endISO: string): string {
   const day = new Intl.DateTimeFormat('de-AT', {

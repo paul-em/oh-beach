@@ -44,6 +44,8 @@ export default defineNuxtConfig({
     googleSheetTab: '',
     googleSheetTabExtra: '',
     googleCalendarId: '',
+    // Interner Vereinstermin-Kalender (nur lesend, vom Vorstand in Google Calendar gepflegt)
+    googleEventsCalendarId: '',
     resendApiKey: '',
     emailFrom: '',
     public: {

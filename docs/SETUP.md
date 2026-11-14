@@ -94,6 +94,15 @@ Termine sperren den Sandplatz **nicht**.
 
 Angezeigt werden Titel, Zeit, Ort und Beschreibung; Serientermine werden einzeln aufgelöst.
 
+**Kalender-Abo für Mitglieder:** Auf `/mitglieder/termine` bekommt jedes Mitglied einen
+persönlichen Abo-Link (`/api/events/calendar.ics?token=…`) für Apple Kalender, Outlook
+oder Google Calendar. Der Token ist mit `NUXT_AUTH_TOKEN_SECRET` verschlüsselt und
+enthält die E-Mail-Adresse; bei jedem Abruf wird geprüft, ob das Mitglied noch aktiv ist
+(`active` im Sheet). Ausgetretene bekommen damit automatisch keine Termine mehr.
+
+> ⚠️ Wird `NUXT_AUTH_TOKEN_SECRET` geändert, werden **alle** Abo-Links ungültig –
+> Mitglieder müssen den Kalender dann neu abonnieren.
+
 ---
 
 ## 4. Resend (E-Mail)

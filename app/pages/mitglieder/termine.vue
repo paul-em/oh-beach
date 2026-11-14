@@ -1,12 +1,24 @@
 <script setup lang="ts">
 import { Card, CardContent } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { CalendarX, Clock, MapPin } from '@lucide/vue'
+import { Button } from '@/components/ui/button'
+import { CalendarSync, CalendarX, Check, Clock, Copy, MapPin } from '@lucide/vue'
+import { toast } from 'vue-sonner'
 
 definePageMeta({ middleware: 'auth' })
 useSeoMeta({ title: 'Termine' })
 
 const { data, pending, error } = await useFetch('/api/events', { default: () => ({ events: [] }) })
+
+// Persönlicher Abo-Link (nur im Browser laden, wird nicht gecacht/gerendert)
+const { data: feed } = useLazyFetch('/api/events/feed-link', { server: false })
+const { copy, copied } = useClipboard({ legacy: true })
+
+async function copyFeedUrl() {
+  if (!feed.value) return
+  await copy(feed.value.url)
+  toast.success('Link kopiert.')
+}
 </script>
 
 <template>
@@ -15,6 +27,39 @@ const { data, pending, error } = await useFetch('/api/events', { default: () => 
       <h1 class="text-4xl">Termine</h1>
       <p class="mt-2 text-muted-foreground">Was im Verein ansteht – Sitzungen, Arbeitseinsätze, Feste und mehr.</p>
     </header>
+
+    <Card class="mb-8">
+      <CardContent class="py-5">
+        <div class="flex items-start gap-3">
+          <div class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand-coral/15 text-brand-coral">
+            <CalendarSync class="size-5" />
+          </div>
+          <div class="min-w-0">
+            <p class="font-semibold">Im eigenen Kalender abonnieren</p>
+            <p class="text-sm text-muted-foreground">
+              Neue Termine erscheinen automatisch in deiner Kalender-App.
+            </p>
+          </div>
+        </div>
+        <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <Button as-child size="sm" :disabled="!feed">
+            <a :href="feed?.webcalUrl">Apple / Outlook</a>
+          </Button>
+          <Button as-child size="sm" variant="secondary" :disabled="!feed">
+            <a :href="feed?.googleUrl" target="_blank" rel="noopener">Google Calendar</a>
+          </Button>
+          <Button size="sm" variant="outline" :disabled="!feed" @click="copyFeedUrl">
+            <Check v-if="copied" class="size-4" /><Copy v-else class="size-4" /> Link kopieren
+          </Button>
+        </div>
+        <p class="mt-3 text-xs text-muted-foreground">
+          Der Link ist persönlich – bitte nicht weitergeben. Kalender-Apps laden Änderungen
+          verzögert nach (Google teils erst nach bis zu 24 Stunden); aktuell ist immer diese Seite.
+          Klappt der Google-Button nicht: Link kopieren und in Google Calendar unter
+          „Weitere Kalender → Per URL“ einfügen.
+        </p>
+      </CardContent>
+    </Card>
 
     <div v-if="pending" class="text-muted-foreground">Lädt …</div>
 
